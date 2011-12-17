@@ -17,7 +17,7 @@ require "collide"
 
 class World
   new: (@vx=0, @vy=0)=>
-    @box = Box 0, 300, screen.w, screen.h
+    @box = Box.from_pt 0, 300, screen.w, screen.h
 
   collides: (player) =>
     false
