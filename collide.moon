@@ -44,7 +44,7 @@ class Box
 
   touches_box: (o) =>
     x1, y1, x2, y2 = @unpack2!
-    ox1, oy1, ox2, oy2 =  o\unpack!
+    ox1, oy1, ox2, oy2 = o\unpack2!
 
     return false if x2 < ox1
     return false if x1 > ox2
@@ -54,7 +54,7 @@ class Box
 
   draw: (color=nil) =>
     setColor color if color
-    rectangle "fill", @unpack2!
+    rectangle "fill", @unpack!
 
   __tostring: =>
     ("box<(%d, %d), (%d, %d)>")\format @unpack!
