@@ -8,7 +8,23 @@ import p from moon
 import rectangle, setColor, getColor from love.graphics
 import keyboard, graphics from love
 
+screen = {
+  w: 800
+  h: 400
+}
+
 require "collide"
+
+class World
+  new: (@vx=0, @vy=0)=>
+    @box = Box 0, 300, screen.w, screen.h
+
+  collides: (player) =>
+    false
+    -- player.box = 
+
+  draw: =>
+    @box\draw { 124, 88, 43 }
 
 class Player
   speed: 400
@@ -44,12 +60,14 @@ b = Box.from_size 0,0, 100, 100
 class Game
   new: =>
     @player = Player 100, 100
+    @w = World!
 
   update: (dt) =>
     @player\update dt
 
   draw: =>
     @player\draw!
+    @w\draw!
     -- b\draw { 255,255,255 }
 
   keypressed: (key, code) =>
