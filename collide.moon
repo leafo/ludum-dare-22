@@ -6,6 +6,15 @@ import rectangle, setColor, getColor from love.graphics
 export *
 
 class Vec2d
+  base = self.__base
+  self.__base.__index = (name) =>
+    if name == "x"
+      self[1]
+    elseif name == "y"
+      self[2]
+    else
+      base[name]
+
   new: (x=0, y=0) =>
     self[1] = x
     self[2] = y
@@ -26,8 +35,14 @@ class Vec2d
     if type(other) == "number"
       Vec2d self[1] * other, self[2] * other
 
+  __add: (other) =>
+    Vec2d self[1] + other[1], self[2] + other[2]
+
+  __sub: (other) =>
+    Vec2d self[1] - other[1], self[2] - other[2]
+
   __tostring: =>
-    ("vec2d<%d, %d>")\format self[1], self[2]
+    ("vec2d<%f, %f>")\format self[1], self[2]
 
 class Box
   self.from_pt = (x1, y1, x2, y2) ->

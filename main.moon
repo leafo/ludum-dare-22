@@ -17,16 +17,17 @@ require "collide"
 require "map"
 
 class World
+  gravity: 0.5
   new: (@vx=0, @vy=0)=>
-    @map = Map 10, {
-      1,0,0,0,0,0,0,0,0,1
-      0,1,1,1,1,1,0,0,0,0
-      0,1,0,1,0,1,0,0,0,0
-      0,1,0,0,0,1,0,0,0,0
-      0,1,0,0,0,1,0,0,0,0
-      1,0,0,0,0,0,0,0,0,1
-      1,0,0,0,0,0,0,0,0,1
-      1,1,1,1,1,1,1,1,1,1
+    @map = Map 19, {
+      1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0
+      0,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0
+      0,1,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0
+      0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0
+      0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0
+      1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0
+      1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0
+      1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
     }
 
   collides: (thing) =>
@@ -38,28 +39,48 @@ class World
     @map\draw!
 
 class Player
+  gravity: Vec2d 0, 20
   speed: 400
   w: 16
   h: 32
   color: { 237, 139, 5 }
 
+  __tostring: =>
+    ("player<grounded: %s>")\format tostring @on_ground
+
   new: (@world, x=0, y=0) =>
     @box = Box x, y, @w, @h
+    @velocity = Vec2d 0, 0
+
+    @on_ground = false
+
 
   update: (dt) =>
     dx = if keyboard.isDown "left" then -1
       elseif keyboard.isDown "right" then 1
       else 0
+  
+    if @on_ground and keyboard.isDown " "
+      @velocity[2] = -400
+    else
+      @velocity += @gravity
 
-    dy = if keyboard.isDown "up" then -1
-      elseif keyboard.isDown "down" then 1
-      else 0
+    delta = Vec2d dx*@speed, 0
+    delta += @velocity
 
-    v = Vec2d(dx, dy)\normalized! * (@speed * dt)
+    delta *= dt
+    collided = @fit_move unpack delta
+    if collided
+      @velocity[2] = 0
+      if delta.y > 0
+        @on_ground = true
+    else
+      if math.floor(delta.y) != 0
+        @on_ground = false
 
-    @fit_move unpack v
-
+  -- returns true if there was a y axis collision
   fit_move: (dx, dy) =>
+    collided = false
     dx = math.floor dx
     dy = math.floor dy
     if dx != 0
@@ -72,7 +93,10 @@ class Player
       ddy = dy < 0 and -1 or 1
       @box.y += dy
       while @world\collides self
+        collided = true
         @box.y -= ddy
+
+    collided
 
   draw: =>
     @box\draw @color
@@ -94,6 +118,9 @@ class Game
     setColor {255,255,255}
     if @dt
       graphics.print tostring(math.floor(1.0/@dt)), 10, 10
+
+    graphics.print tostring(@player.velocity), 10, 20
+    graphics.print tostring(@player), 10, 30
 
   keypressed: (key, code) =>
     os.exit! if key == "escape"
