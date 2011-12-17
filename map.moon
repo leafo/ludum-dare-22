@@ -15,7 +15,7 @@ class Tile extends Box
     rectangle "fill", @unpack!
 
 class Map
-  cell_size: 32
+  cell_size: 16
 
   color: {
     surface: {133, 168, 119}

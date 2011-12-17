@@ -1,5 +1,6 @@
 
 import graphics from love
+import push, pop, scale, translate from graphics
 
 export *
 
@@ -20,7 +21,7 @@ class StateAnim
     @current\draw x, y
 
 class Animator
-  new: (@sprite, @sequence, @rate) => @reset!
+  new: (@sprite, @sequence, @rate, @flip=false) => @reset!
 
   reset: =>
     @time = 0
@@ -33,8 +34,8 @@ class Animator
       @i = @i + 1
       @i = 1 if @i > #@sequence
 
-  draw: (x, y, ...) =>
-    @sprite\draw_cell @sequence[@i], x, y, ...
+  draw: (x, y) =>
+    @sprite\draw_cell @sequence[@i], x, y, @flip
 
 class Spriter
   new: (@img, @cell_w, @cell_h, @width=0) =>
@@ -45,10 +46,9 @@ class Spriter
 
     @quads = {}
 
-  seq: (seq, rate) =>
-    Animator self, seq, rate
+  seq: (...) => Animator self, ...
 
-  draw_cell: (i, x, y) =>
+  draw_cell: (i, x, y, flip=false) =>
     if not @quads[i]
       sx, sy = if @width == 0
         @ox + i * @cell_w, @oy
@@ -57,7 +57,18 @@ class Spriter
 
       @quads[i] = graphics.newQuad sx, sy, @cell_w, @cell_h, @iw, @ih
 
-    graphics.drawq @img, @quads[i], x, y
+    if flip
+      push!
+      translate x, y
+      translate @cell_w, 0
+      scale -1, 1
 
+      graphics.drawq @img, @quads[i], 0, 0
+
+      pop!
+    else
+      graphics.drawq @img, @quads[i], x, y
+
+    nil
 
 

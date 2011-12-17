@@ -85,16 +85,25 @@ class Player
 
     @on_ground = false
 
-    @img = graphics.newImage "images/player.png"
-    @sprite = Spriter @img, 14, 30, 4
-    @a = @sprite\seq {0,1,2}, 0.2
+    img = graphics.newImage "images/player.png"
+    sprite = Spriter img, 14, 30, 4
+
+    @a = StateAnim "right", {
+      right: sprite\seq {0,1,2}, 0.2
+      left: sprite\seq {0,1,2}, 0.2, true
+    }
 
   update: (dt) =>
     @a\update dt
 
-    dx = if keyboard.isDown "left" then -1
-      elseif keyboard.isDown "right" then 1
-      else 0
+    dx = if keyboard.isDown "left"
+      @a\set_state "left"
+      -1
+    elseif keyboard.isDown "right"
+      @a\set_state "right"
+      1
+    else
+      0
   
     if @on_ground and keyboard.isDown " "
       @velocity[2] = -400
@@ -135,7 +144,8 @@ class Player
     collided
 
   draw: =>
-    @box\draw @color
+    -- @box\draw @color
+    setColor 255, 255, 255
     @a\draw @box.x, @box.y
 
 b = Box 0,0, 100, 100
