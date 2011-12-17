@@ -55,7 +55,13 @@ class Viewport
 class World
   gravity: 0.5
   new: (@vx=0, @vy=0)=>
-    @bg = Paralax "images/bg1.png", 1
+    @bgs = {
+      Paralax "images/bg1.png", 0.5
+      Paralax "images/bg2.png", 0.8, 0.9, {
+        repeat_y: false
+        oy: 3970
+      }
+    }
     @map = Map.from_image "images/map1.png", "images/tiles.png"
 
   spawn_player: (@player) =>
@@ -72,7 +78,9 @@ class World
     false
 
   draw: =>
-    @bg\draw game.viewport
+    for bg in *@bgs
+      bg\draw game.viewport
+
     @map\draw game.viewport
     @player\draw! if @player
     -- @show_collidable!
