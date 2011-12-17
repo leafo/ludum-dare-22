@@ -7,6 +7,9 @@ require "moon"
 import p from moon
 import rectangle, setColor, getColor from love.graphics
 import keyboard, graphics from love
+import insert from table
+
+export game
 
 screen = {
   w: 800
@@ -15,6 +18,7 @@ screen = {
 
 require "collide"
 require "map"
+require "particle"
 
 center_on = (thing) ->
   graphics.translate -thing.box.x, -thing.box.y
@@ -25,6 +29,9 @@ class Viewport
 
   apply: =>
     graphics.translate -@box.x, -@box.y
+
+  unproject: (x,y) =>
+    @box.x + x, @box.y + y
 
   center_on: (thing) =>
     cx, cy = thing.box\center!
@@ -50,8 +57,8 @@ class World
       return true if thing.box\touches_box tile_box
     false
 
-  draw: (viewport) =>
-    @map\draw viewport
+  draw: =>
+    @map\draw game.viewport
     @player\draw! if @player
     @show_collidable!
 
@@ -122,20 +129,28 @@ b = Box 0,0, 100, 100
 class Game
   new: =>
     @w = World!
-    @view = Viewport!
+    @viewport = Viewport!
     @player = Player @w, 100, 100
 
     @w\spawn_player @player
 
+    @emitters = {}
+
   update: (dt) =>
     @player\update dt
-    @dt = dt
+
+    for e in *@emitters
+      e\update dt
 
   draw: =>
     graphics.push!
-    @view\center_on @player
-    @view\apply!
-    @w\draw @view
+    @viewport\center_on @player
+    @viewport\apply!
+    @w\draw!
+
+    for e in *@emitters
+      e\draw!
+
     graphics.pop!
 
     setColor {255,255,255}
@@ -148,12 +163,8 @@ class Game
     os.exit! if key == "escape"
 
   mousepressed: (x, y, button) =>
-    if button == "r"
-      print "mouse:", Vec2d x, y
-      box = @player.box
-      print box\touches_pt x, y
-    else
-      print @player.box
+    x, y = @viewport\unproject x,y
+    insert @emitters, Emitter x, y
 
 
 love.load = ->
@@ -162,5 +173,7 @@ love.load = ->
   love.draw = g\draw
   love.keypressed = g\keypressed
   love.mousepressed = g\mousepressed
+
+  game = g
   -- love.keyreleased = g\keyreleased
 

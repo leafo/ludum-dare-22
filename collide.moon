@@ -2,6 +2,7 @@
 -- collision stuff
 
 import rectangle, setColor, getColor from love.graphics
+import rad, atan2, cos, sin from math
 
 export *
 
@@ -14,6 +15,13 @@ class Vec2d
       self[2]
     else
       base[name]
+
+  self.from_angle = (deg) ->
+    theta = rad deg
+    Vec2d cos(theta), sin(theta)
+
+  angle: =>
+    atan2 self[2], self[1]
 
   new: (x=0, y=0) =>
     self[1] = x
