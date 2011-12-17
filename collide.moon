@@ -59,4 +59,59 @@ class Box
   __tostring: =>
     ("box<(%d, %d), (%d, %d)>")\format @unpack!
 
+hash_pt = (x,y) ->
+  tostring(x)..":"..tostring(y)
+
+class SetList
+  new: => @contains = {}
+  add: (item) =>
+    print "adding", item
+    return if @contains[item]
+    @contains[item] = true
+    self[#self+1] = item
+
+class UniformGrid
+  new: (@cell_size=10) =>
+    @buckets = {}
+
+  add: (box) =>
+    for bucket, key in @buckets_for_box box, true
+      print "inserting into", key
+      table.insert bucket, box
+
+  get_candidates: (query) =>
+    with SetList!
+      for bucket in @buckets_for_box query
+        for box in *bucket
+          \add box
+
+  bucket_for_pt: (x,y, insert=false) =>
+    x = math.floor x / @cell_size
+    y = math.floor y / @cell_size
+    key = hash_pt x, y
+    b = @buckets[key]
+    if not b and insert
+      b = {}
+      @buckets[key] = b
+    b, key
+
+  buckets_for_box: (box, insert=false) =>
+    coroutine.wrap ->
+      x1, y1, x2, y2 = box\unpack2!
+      while x1 < x2
+        while y1 < y2
+          b, k = @bucket_for_pt x1, y1, insert
+          coroutine.yield b, k if b
+          y1 += @cell_size
+        x1 += @cell_size
+
+
+if __test == true
+  import p from require "moon"
+  g = UniformGrid!
+  g\add Box 1,1, 10, 10
+  g\add Box 5,5, 10, 10
+  g\add Box 10,0, 10, 10
+
+  p g\get_candidates Box 0,0, 1,1
 
