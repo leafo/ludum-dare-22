@@ -8,6 +8,7 @@ class StateAnim
   new: (initial, @states) =>
     @current_name = nil
     @set_state initial
+    @paused = false
 
   set_state: (name) =>
     @current = @states[name]
@@ -15,24 +16,25 @@ class StateAnim
     @current_name = name
 
   update: (dt) =>
-    @current\update dt
+    @current\update dt if not @paused
 
   draw: (x,y) =>
     @current\draw x, y
 
 class Animator
-  new: (@sprite, @sequence, @rate, @flip=false) => @reset!
+  new: (@sprite, @sequence, @rate=0, @flip=false) => @reset!
 
   reset: =>
     @time = 0
     @i = 1
 
   update: (dt) =>
-    @time += dt
-    if @time > @rate
-      @time -= @rate
-      @i = @i + 1
-      @i = 1 if @i > #@sequence
+    if @rate > 0
+      @time += dt
+      if @time > @rate
+        @time -= @rate
+        @i = @i + 1
+        @i = 1 if @i > #@sequence
 
   draw: (x, y) =>
     @sprite\draw_cell @sequence[@i], x, y, @flip

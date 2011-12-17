@@ -19,23 +19,27 @@ class Player
     @velocity = Vec2d 0, 0
 
     @on_ground = false
+    @facing = "left"
 
     img = graphics.newImage "images/player.png"
-    sprite = Spriter img, 14, 30, 4
+    sprite = Spriter img, 14, 30, 3
 
     @a = StateAnim "right", {
       right: sprite\seq {0,1,2}, 0.2
       left: sprite\seq {0,1,2}, 0.2, true
+
+      right_air: sprite\seq {3}, 0
+      left_air: sprite\seq {3}, 0, true
     }
 
   update: (dt) =>
     @a\update dt
 
     dx = if keyboard.isDown "left"
-      @a\set_state "left"
+      @facing = "left"
       -1
     elseif keyboard.isDown "right"
-      @a\set_state "right"
+      @facing = "right"
       1
     else
       0
@@ -57,6 +61,12 @@ class Player
     else
       if math.floor(delta.y) != 0
         @on_ground = false
+
+    state = @facing
+    if not @on_ground
+      state = state.."_air"
+
+    @a\set_state state
 
   -- returns true if there was a y axis collision
   fit_move: (dx, dy) =>
