@@ -14,22 +14,33 @@ screen = {
 }
 
 require "collide"
+require "map"
 
 class World
   new: (@vx=0, @vy=0)=>
-    @box = Box.from_pt 0, 300, screen.w, screen.h
-    print @box
+    @map = Map 10, {
+      1,0,0,0,0,0,0,0,0,1
+      0,1,1,1,1,1,0,0,0,0
+      0,1,0,1,0,1,0,0,0,0
+      0,1,0,0,0,1,0,0,0,0
+      0,1,0,0,0,1,0,0,0,0
+      1,0,0,0,0,0,0,0,0,1
+      1,0,0,0,0,0,0,0,0,1
+      1,1,1,1,1,1,1,1,1,1
+    }
 
   collides: (thing) =>
-    thing.box\touches_box @box
+    for tile_box in *@map\get_candidates thing.box
+      return true if thing.box\touches_box tile_box
+    false
 
   draw: =>
-    @box\draw { 124, 88, 43 }
+    @map\draw!
 
 class Player
   speed: 400
-  w: 32
-  h: 64
+  w: 16
+  h: 32
   color: { 237, 139, 5 }
 
   new: (@world, x=0, y=0) =>

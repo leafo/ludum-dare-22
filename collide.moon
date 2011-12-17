@@ -65,7 +65,6 @@ hash_pt = (x,y) ->
 class SetList
   new: => @contains = {}
   add: (item) =>
-    print "adding", item
     return if @contains[item]
     @contains[item] = true
     self[#self+1] = item
