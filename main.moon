@@ -47,7 +47,7 @@ class World
 
   show_collidable: =>
     for box in *@map\get_candidates @player.box
-      box\draw { 240, 81, 90 }
+      Box.draw box, { 240, 81, 90, 128 }
 
   collides: (thing) =>
     for tile_box in *@map\get_candidates thing.box
@@ -160,8 +160,12 @@ class Game
     os.exit! if key == "escape"
 
   mousepressed: (x, y, button) =>
-    x, y = @viewport\unproject x,y
-    insert @emitters, Emitter x, y
+    if button == "l"
+      x, y = @viewport\unproject x,y
+      insert @emitters, Emitter x, y
+    else
+      @emitters = {}
+    nil
 
 
 love.load = ->
