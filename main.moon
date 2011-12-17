@@ -11,10 +11,18 @@ import insert from table
 
 export game
 
+scale = 2
 screen = {
-  w: 800
-  h: 400
+  scale: scale
+  w: 800/scale
+  h: 400/scale
 }
+
+_newImage = graphics.newImage
+graphics.newImage = (...) ->
+  print "loading image"
+  with _newImage ...
+    \setFilter "nearest", "nearest"
 
 require "collide"
 require "map"
@@ -29,6 +37,7 @@ class Viewport
     graphics.translate -@box.x, -@box.y
 
   unproject: (x,y) =>
+    x, y = x / screen.scale, y / screen.scale
     @box.x + x, @box.y + y
 
   center_on: (thing) =>
@@ -148,6 +157,7 @@ class Game
       e\update dt
 
   draw: =>
+    graphics.scale screen.scale, screen.scale
     graphics.push!
     @viewport\center_on @player
     @viewport\apply!
