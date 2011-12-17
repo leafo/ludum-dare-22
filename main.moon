@@ -50,8 +50,8 @@ class World
       return true if thing.box\touches_box tile_box
     false
 
-  draw: =>
-    @map\draw!
+  draw: (viewport) =>
+    @map\draw viewport
     @player\draw! if @player
     @show_collidable!
 
@@ -135,13 +135,12 @@ class Game
     graphics.push!
     @view\center_on @player
     @view\apply!
-    @w\draw!
+    @w\draw @view
     graphics.pop!
 
     setColor {255,255,255}
-    if @dt
-      graphics.print tostring(math.floor(1.0/@dt)), 10, 10
 
+    graphics.print tostring(love.timer.getFPS!), 10, 10
     graphics.print tostring(@player.box), 10, 20
     graphics.print tostring(@player), 10, 30
 

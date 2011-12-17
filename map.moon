@@ -53,8 +53,12 @@ class Map
           y = math.floor(i / @width) * @cell_size
           coroutine.yield x, y, t
 
-  draw: =>
+  draw: (viewport) =>
     setColor @color
-    for x,y,t in @each_xyt!
-      rectangle "fill", x, y, @cell_size, @cell_size
+    for block in *@get_candidates viewport.box
+      block\draw!
+
+    -- for x,y,t in @each_xyt!
+    --   count += 1
+    --   rectangle "fill", x, y, @cell_size, @cell_size
 
