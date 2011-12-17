@@ -27,8 +27,18 @@ class World
       0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0
       1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0
       1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0
+      1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,1,1,1
+      1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
+      1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1
+      1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1
+      1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
       1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
     }
+
+
+  show_collidable: =>
+    for box in *@map\get_candidates @player.box
+      box\draw { 240, 81, 90 }
 
   collides: (thing) =>
     for tile_box in *@map\get_candidates thing.box
@@ -37,6 +47,7 @@ class World
 
   draw: =>
     @map\draw!
+    @show_collidable!
 
 class Player
   gravity: Vec2d 0, 20
@@ -49,6 +60,8 @@ class Player
     ("player<grounded: %s>")\format tostring @on_ground
 
   new: (@world, x=0, y=0) =>
+    @world.player = self
+
     @box = Box x, y, @w, @h
     @velocity = Vec2d 0, 0
 

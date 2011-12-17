@@ -112,20 +112,20 @@ class UniformGrid
   buckets_for_box: (box, insert=false) =>
     coroutine.wrap ->
       x1, y1, x2, y2 = box\unpack2!
-      while x1 < x2
-        while y1 < y2
-          b, k = @bucket_for_pt x1, y1, insert
+      x, y = x1, y1
+      while x < x2 + @cell_size
+        y = y1
+        while y < y2 + @cell_size
+          b, k = @bucket_for_pt x, y, insert
           coroutine.yield b, k if b
-          y1 += @cell_size
-        x1 += @cell_size
+          y += @cell_size
+        x += @cell_size
 
 
-if __test == true
+if  __test == true
   import p from require "moon"
-  g = UniformGrid!
-  g\add Box 1,1, 10, 10
-  g\add Box 5,5, 10, 10
-  g\add Box 10,0, 10, 10
+  g = UniformGrid 100
+  g\add Box 90, 0, 20, 20
 
-  p g\get_candidates Box 0,0, 1,1
+  -- p g\get_candidates Box 0,0, 1,1
 
