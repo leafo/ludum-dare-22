@@ -16,18 +16,25 @@ class Map
     data = love.image.newImageData fname
     width, height = data\getWidth!, data\getHeight!
 
+    spawn = {0,0}
+
     tiles = {}
     len = 1
     for y=0,height - 1
       for x=0,width - 1
         r,g,b,a = data\getPixel x, y
         if a == 255
-          tiles[len] = 1
+          if r == 255
+            spawn = {x,y}
+            tiles[len] = 0
+          else
+            tiles[len] = 1
         else
           tiles[len] = 0
         len += 1
 
-    Map width, tiles
+    with Map width, tiles
+      .spawn = {spawn[1] * .cell_size, spawn[2] * .cell_size}
 
   new: (@width, @tiles) =>
     @solid = UniformGrid @cell_size * 4

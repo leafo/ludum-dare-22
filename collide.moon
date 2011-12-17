@@ -53,6 +53,11 @@ class Box
   unpack: => @x, @y, @w, @h
   unpack2: => @x, @y, @x + @w, @y + @h
 
+  set_pos: (@x, @y) =>
+
+  center: =>
+    @x + @w / 2, @y + @h / 2
+
   touches_pt: (x, y) =>
     x1, y1, x2, y2 = @unpack2!
     x > x1 and x < x2 and y > y1 and y < y2

@@ -16,10 +16,30 @@ screen = {
 require "collide"
 require "map"
 
+center_on = (thing) ->
+  graphics.translate -thing.box.x, -thing.box.y
+
+class Viewport
+  new: =>
+    @box = Box 0,0, screen.w, screen.h
+
+  apply: =>
+    graphics.translate -@box.x, -@box.y
+
+  center_on: (thing) =>
+    cx, cy = thing.box\center!
+
+    @box.x = cx - @box.w / 2
+    @box.y = cy - @box.h / 2
+
 class World
   gravity: 0.5
   new: (@vx=0, @vy=0)=>
     @map = Map.from_image "images/map1.png"
+
+  spawn_player: (@player) =>
+    if @map.spawn
+      @player.box\set_pos unpack @map.spawn
 
   show_collidable: =>
     for box in *@map\get_candidates @player.box
@@ -32,6 +52,7 @@ class World
 
   draw: =>
     @map\draw!
+    @player\draw! if @player
     @show_collidable!
 
 class Player
@@ -45,13 +66,10 @@ class Player
     ("player<grounded: %s>")\format tostring @on_ground
 
   new: (@world, x=0, y=0) =>
-    @world.player = self
-
     @box = Box x, y, @w, @h
     @velocity = Vec2d 0, 0
 
     @on_ground = false
-
 
   update: (dt) =>
     dx = if keyboard.isDown "left" then -1
@@ -104,20 +122,27 @@ b = Box 0,0, 100, 100
 class Game
   new: =>
     @w = World!
+    @view = Viewport!
     @player = Player @w, 100, 100
+
+    @w\spawn_player @player
 
   update: (dt) =>
     @player\update dt
     @dt = dt
 
   draw: =>
-    @player\draw!
+    graphics.push!
+    @view\center_on @player
+    @view\apply!
     @w\draw!
+    graphics.pop!
+
     setColor {255,255,255}
     if @dt
       graphics.print tostring(math.floor(1.0/@dt)), 10, 10
 
-    graphics.print tostring(@player.velocity), 10, 20
+    graphics.print tostring(@player.box), 10, 20
     graphics.print tostring(@player), 10, 30
 
   keypressed: (key, code) =>
