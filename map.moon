@@ -5,7 +5,7 @@ require "moon"
 require "collide"
 
 import rectangle, setColor, getColor from love.graphics
-import mixin_object, defaultbl from moon
+import mixin_object from moon
 
 export *
 
@@ -67,9 +67,11 @@ class Map
 
   new: (@width, @height, @tiles) =>
     @count = @width * @height
+    layer = -> UniformGrid @cell_size * 3
 
-    @layers = defaultbl {}, -> UniformGrid @cell_size * 4
-    @solid = @layers[1]
+    @min_layer, @max_layer = nil
+
+    @layers = {}
 
     ground = {}
     for x,y,t,i in @each_xyt!
@@ -78,12 +80,14 @@ class Map
           x * @cell_size, y * @cell_size,
           @cell_size, @cell_size
 
+        @min_layer = not @min_layer and t.layer or math.min @min_layer, t.layer
+        @max_layer = not @max_layer and t.layer or math.max @max_layer, t.layer
+
+        @layers[t.layer] = layer!  if not @layers[t.layer]
         @layers[t.layer]\add box
 
         if t.layer == 1 -- ground
           ground[i] = box
-
-        @solid\add box
 
     -- color the tiles
     for x,y,t in @each_xyt ground
@@ -92,6 +96,8 @@ class Map
         if above == nil
           t.sid = style.surface
 
+    print "min:", @min_layer, "max:", @max_layer
+    @solid = @layers[1]
     mixin_object self, @solid, {"get_candidates"}
  
   to_xy: (i) =>
@@ -116,6 +122,7 @@ class Map
         coroutine.yield x, y, t, i
 
   draw: (viewport) =>
-    for tile in *@get_candidates viewport.box
-      tile\draw @sprite
+    for i=@min_layer,@max_layer
+      for tile in *@layers[i]\get_candidates viewport.box
+        tile\draw @sprite
 
