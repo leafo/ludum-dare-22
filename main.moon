@@ -24,11 +24,16 @@ graphics.newImage = (...) ->
   with _newImage ...
     \setFilter "nearest", "nearest"
 
+export imgfy = (img) ->
+  img = graphics.newImage img if "string" == type img
+  img
+
 require "collide"
 require "map"
 require "particle"
 require "spriter"
 require "player"
+require "background"
 
 class Viewport
   new: =>
@@ -50,7 +55,8 @@ class Viewport
 class World
   gravity: 0.5
   new: (@vx=0, @vy=0)=>
-    @map = Map.from_image "images/map1.png"
+    @bg = Paralax "images/bg1.png", 1
+    @map = Map.from_image "images/map1.png", "images/tiles.png"
 
   spawn_player: (@player) =>
     if @map.spawn
@@ -66,9 +72,10 @@ class World
     false
 
   draw: =>
+    @bg\draw game.viewport
     @map\draw game.viewport
     @player\draw! if @player
-    @show_collidable!
+    -- @show_collidable!
 
 class Game
   new: =>

@@ -9,20 +9,19 @@ import mixin_object from moon
 
 export *
 
+style = {
+  surface: 1
+  dirt: 0
+}
+
 class Tile extends Box
-  draw: =>
-    setColor @color
-    rectangle "fill", @unpack!
+  new: (@sid, ...) => super ...
+  draw: (sprite) => sprite\draw_cell @sid, @x, @y
 
 class Map
   cell_size: 16
 
-  color: {
-    surface: {133, 168, 119}
-    dirt: {111, 140, 99}
-  }
-
-  self.from_image = (fname) ->
+  self.from_image = (fname, tile_image) ->
     data = love.image.newImageData fname
     width, height = data\getWidth!, data\getHeight!
 
@@ -44,6 +43,7 @@ class Map
         len += 1
 
     with Map width, tiles
+      .sprite = Spriter tile_image, .cell_size, .cell_size
       .spawn = {spawn[1] * .cell_size, spawn[2] * .cell_size}
 
   new: (@width, @tiles) =>
@@ -54,12 +54,12 @@ class Map
 
     for x,y,t, i in @each_xyt!
       @tiles[i] = if t > 0
-        box = with Tile x * @cell_size, y * @cell_size, @cell_size, @cell_size
-          .color = @color.dirt
-          .i = i
+        tile = Tile style.dirt,
+          x * @cell_size, y * @cell_size,
+          @cell_size, @cell_size
 
-        @solid\add box
-        box
+        @solid\add tile
+        tile
       else
         nil
 
@@ -68,7 +68,7 @@ class Map
       if t
         above = @get_tile x, y - 1
         if above == nil
-          t.color = @color.surface
+          t.sid = style.surface
 
     mixin_object self, @solid, {"get_candidates"}
  
@@ -94,5 +94,5 @@ class Map
 
   draw: (viewport) =>
     for tile in *@get_candidates viewport.box
-      tile\draw!
+      tile\draw @sprite
 

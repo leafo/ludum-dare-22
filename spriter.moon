@@ -41,6 +41,9 @@ class Animator
 
 class Spriter
   new: (@img, @cell_w, @cell_h, @width=0) =>
+    if "string" == type @img
+      @img = graphics.newImage @img
+
     @iw, @ih = @img\getWidth!, @img\getHeight!
 
     @ox = 0

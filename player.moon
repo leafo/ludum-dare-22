@@ -19,10 +19,9 @@ class Player
     @velocity = Vec2d 0, 0
 
     @on_ground = false
-    @facing = "left"
+    @facing = "right"
 
-    img = graphics.newImage "images/player.png"
-    sprite = Spriter img, 14, 30, 3
+    sprite = Spriter "images/player.png", 14, 30, 3
 
     @a = StateAnim "right", {
       right: sprite\seq {0,1,2}, 0.2
@@ -91,5 +90,5 @@ class Player
   draw: =>
     -- @box\draw @color
     setColor 255, 255, 255
-    @a\draw @box.x, @box.y
+    @a\draw @box.x, @box.y+1
 
