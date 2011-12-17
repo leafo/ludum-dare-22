@@ -5,14 +5,31 @@ require "moon"
 require "collide"
 
 import rectangle, setColor, getColor from love.graphics
-import mixin_object from moon
+import mixin_object, defaultbl from moon
 
 export *
 
 style = {
-  surface: 1
   dirt: 0
+  surface: 1
+  behind: 2
 }
+
+hash_color = (r,g,b) ->
+  r.."-"..g.."-"..b
+
+tile_types = {
+  ["0-0-0"]: {
+    sid: style.dirt
+    layer: 1
+  }
+  ["198-132-49"]: {
+    sid: style.behind
+    layer: 0
+  }
+  ["255-0-0"]: { spawn: true }
+}
+
 
 class Tile extends Box
   new: (@sid, ...) => super ...
@@ -33,60 +50,66 @@ class Map
       for x=0,width - 1
         r,g,b,a = data\getPixel x, y
         if a == 255
-          if r == 255
-            spawn = {x,y}
-            tiles[len] = 0
-          else
-            tiles[len] = 1
-        else
-          tiles[len] = 0
+          tile = tile_types[hash_color r,g,b,a]
+          tiles[len] = if tile
+            if tile.spawn
+              spawn = {x,y}
+              nil
+            else
+              tile
+
         len += 1
 
-    with Map width, tiles
+    with Map width, height, tiles
       .sprite = Spriter tile_image, .cell_size, .cell_size
       .spawn = {spawn[1] * .cell_size, spawn[2] * .cell_size}
 
-  new: (@width, @tiles) =>
-    @solid = UniformGrid @cell_size * 4
 
-    @count = #@tiles
-    @height = @count / @width
+  new: (@width, @height, @tiles) =>
+    @count = @width * @height
 
-    for x,y,t, i in @each_xyt!
-      @tiles[i] = if t > 0
-        tile = Tile style.dirt,
+    @layers = defaultbl {}, -> UniformGrid @cell_size * 4
+    @solid = @layers[1]
+
+    ground = {}
+    for x,y,t,i in @each_xyt!
+      if t
+        box = Tile t.sid,
           x * @cell_size, y * @cell_size,
           @cell_size, @cell_size
 
-        @solid\add tile
-        tile
-      else
-        nil
+        @layers[t.layer]\add box
+
+        if t.layer == 1 -- ground
+          ground[i] = box
+
+        @solid\add box
 
     -- color the tiles
-    for x,y,t,i in @each_xyt!
+    for x,y,t in @each_xyt ground
       if t
-        above = @get_tile x, y - 1
+        above = ground[@to_i x, y - 1]
         if above == nil
           t.sid = style.surface
 
     mixin_object self, @solid, {"get_candidates"}
  
   to_xy: (i) =>
+    i -= i
     x = i % @width
     y = math.floor(i / @width)
     x, y
 
-  get_tile: (x,y) =>
+  to_i: (x,y) =>
     return false if x < 0 or x >= @width
     return false if y < 0 or y >= @height
-    @tiles[y * @width + x + 1]
+    y * @width + x + 1
 
   -- final x,y coord
-  each_xyt: =>
+  each_xyt: (tiles=@tiles)=>
     coroutine.wrap ->
       for i=1,@count
-        t = @tiles[i]
+        t = tiles[i]
         i -= 1
         x = i % @width
         y = math.floor(i / @width)

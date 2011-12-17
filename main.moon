@@ -59,10 +59,10 @@ class World
       Paralax "images/bg1.png", 0.5
       Paralax "images/bg2.png", 0.8, 0.9, {
         repeat_y: false
-        oy: 3970
+        oy: 1210
       }
     }
-    @map = Map.from_image "images/map1.png", "images/tiles.png"
+    @map = Map.from_image "images/small.png", "images/tiles.png"
 
   spawn_player: (@player) =>
     if @map.spawn
