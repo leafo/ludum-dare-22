@@ -90,7 +90,6 @@ class UniformGrid
 
   add: (box) =>
     for bucket, key in @buckets_for_box box, true
-      print "inserting into", key
       table.insert bucket, box
 
   get_candidates: (query) =>

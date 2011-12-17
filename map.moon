@@ -9,11 +9,28 @@ import mixin_object from moon
 export *
 
 class Map
-  cell_size: 32
+  cell_size: 16
   color: { 133, 168, 119 }
 
+  self.from_image = (fname) ->
+    data = love.image.newImageData fname
+    width, height = data\getWidth!, data\getHeight!
+
+    tiles = {}
+    len = 1
+    for y=0,height - 1
+      for x=0,width - 1
+        r,g,b,a = data\getPixel x, y
+        if a == 255
+          tiles[len] = 1
+        else
+          tiles[len] = 0
+        len += 1
+
+    Map width, tiles
+
   new: (@width, @tiles) =>
-    @solid = UniformGrid @cell_size * 8
+    @solid = UniformGrid @cell_size * 4
     for x,y,t in @each_xyt!
       if t
         @solid\add Box x,y, @cell_size, @cell_size
