@@ -35,7 +35,7 @@ class Player
   new: (@x, @y) =>
 
   box: =>
-    Box.from_size @x, @y, @w, @h
+    Box @x, @y, @w, @h
 
   update: (dt) =>
     dx = if keyboard.isDown "left" then -1
@@ -55,7 +55,7 @@ class Player
     setColor @color
     rectangle "fill", @x, @y, @w, @h
 
-b = Box.from_size 0,0, 100, 100
+b = Box 0,0, 100, 100
 
 class Game
   new: =>
@@ -64,6 +64,12 @@ class Game
 
   update: (dt) =>
     @player\update dt
+
+    -- pb = @player\box!
+    -- if b\touches_box pb
+    --   print "touching"
+    -- else
+    --   print "not touching"
 
   draw: =>
     @player\draw!

@@ -30,23 +30,26 @@ class Vec2d
     ("vec2d<%d, %d>")\format self[1], self[2]
 
 class Box
-  self.from_size = (x,y,w,h) ->
-    Box x,y, x+w, x+h
+  self.from_pt = (x1, y1, x2, y2) ->
+    Box x1, y1, x2 - x1, y2 - y1
 
-  new: (@x1, @y1, @x2, @y2) =>
+  new: (@x, @y, @w, @h) =>
 
-  unpack: => @x1, @y1, @x2, @y2
-  unpack2: => @x1, @y1, @x2 - @x1, @y2 - @y1
+  unpack: => @x, @y, @w, @h
+  unpack2: => @x, @y, @x + @w, @y + @h
 
   touches_pt: (x, y) =>
-    x > @x1 and x < @x2 and y > @y1 and y < @y2
-
+    x1, y1, x2, y2 = @unpack2!
+    x > x1 and x < x2 and y > y1 and y < y2
 
   touches_box: (o) =>
-    return false if @x2 < o.x1
-    return false if @x1 > o.x2
-    return false if @y2 < o.y1
-    return false if @y1 > o.y2
+    x1, y1, x2, y2 = @unpack2!
+    ox1, oy1, ox2, oy2 =  o\unpack!
+
+    return false if x2 < ox1
+    return false if x1 > ox2
+    return false if y2 < oy1
+    return false if y1 > oy2
     true
 
   draw: (color=nil) =>
@@ -54,6 +57,6 @@ class Box
     rectangle "fill", @unpack2!
 
   __tostring: =>
-    ("box<(%d, %d), (%d, %d)>")\format @x1, @y1, @x2, @y2
+    ("box<(%d, %d), (%d, %d)>")\format @unpack!
 
 
