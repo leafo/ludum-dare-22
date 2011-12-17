@@ -75,10 +75,14 @@ class Game
 
   update: (dt) =>
     @player\update dt
+    @dt = dt
 
   draw: =>
     @player\draw!
     @w\draw!
+    setColor {255,255,255}
+    if @dt
+      graphics.print tostring(math.floor(1.0/@dt)), 10, 10
 
   keypressed: (key, code) =>
     os.exit! if key == "escape"
