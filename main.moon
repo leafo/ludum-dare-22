@@ -19,6 +19,7 @@ screen = {
 require "collide"
 require "map"
 require "particle"
+require "spriter"
 
 class Viewport
   new: =>
@@ -39,7 +40,7 @@ class Viewport
 class World
   gravity: 0.5
   new: (@vx=0, @vy=0)=>
-    @map = Map.from_image "images/small.png"
+    @map = Map.from_image "images/map1.png"
 
   spawn_player: (@player) =>
     if @map.spawn
@@ -75,7 +76,13 @@ class Player
 
     @on_ground = false
 
+    @img = graphics.newImage "images/player.png"
+    @sprite = Spriter @img, 14, 30, 4
+    @a = @sprite\seq {0,1,2}, 0.2
+
   update: (dt) =>
+    @a\update dt
+
     dx = if keyboard.isDown "left" then -1
       elseif keyboard.isDown "right" then 1
       else 0
@@ -120,6 +127,7 @@ class Player
 
   draw: =>
     @box\draw @color
+    @a\draw @box.x, @box.y
 
 b = Box 0,0, 100, 100
 
