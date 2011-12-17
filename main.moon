@@ -20,9 +20,6 @@ require "collide"
 require "map"
 require "particle"
 
-center_on = (thing) ->
-  graphics.translate -thing.box.x, -thing.box.y
-
 class Viewport
   new: =>
     @box = Box 0,0, screen.w, screen.h
@@ -42,7 +39,7 @@ class Viewport
 class World
   gravity: 0.5
   new: (@vx=0, @vy=0)=>
-    @map = Map.from_image "images/map1.png"
+    @map = Map.from_image "images/small.png"
 
   spawn_player: (@player) =>
     if @map.spawn
@@ -64,9 +61,9 @@ class World
 
 class Player
   gravity: Vec2d 0, 20
-  speed: 400
-  w: 16
-  h: 32
+  speed: 300
+  w: 14
+  h: 30
   color: { 237, 139, 5 }
 
   __tostring: =>

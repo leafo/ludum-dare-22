@@ -2,15 +2,25 @@
 -- some sort of a tile, and collision, map
 
 require "moon"
+require "collide"
 
 import rectangle, setColor, getColor from love.graphics
 import mixin_object from moon
 
 export *
 
+class Tile extends Box
+  draw: =>
+    setColor @color
+    rectangle "fill", @unpack!
+
 class Map
-  cell_size: 16
-  color: { 133, 168, 119 }
+  cell_size: 32
+
+  color: {
+    surface: {133, 168, 119}
+    dirt: {111, 140, 99}
+  }
 
   self.from_image = (fname) ->
     data = love.image.newImageData fname
@@ -38,27 +48,51 @@ class Map
 
   new: (@width, @tiles) =>
     @solid = UniformGrid @cell_size * 4
-    for x,y,t in @each_xyt!
+
+    @count = #@tiles
+    @height = @count / @width
+
+    for x,y,t, i in @each_xyt!
+      @tiles[i] = if t > 0
+        box = with Tile x * @cell_size, y * @cell_size, @cell_size, @cell_size
+          .color = @color.dirt
+          .i = i
+
+        @solid\add box
+        box
+      else
+        nil
+
+    -- color the tiles
+    for x,y,t,i in @each_xyt!
       if t
-        @solid\add Box x,y, @cell_size, @cell_size
+        above = @get_tile x, y - 1
+        if above == nil
+          t.color = @color.surface
 
     mixin_object self, @solid, {"get_candidates"}
+ 
+  to_xy: (i) =>
+    x = i % @width
+    y = math.floor(i / @width)
+    x, y
 
+  get_tile: (x,y) =>
+    return false if x < 0 or x >= @width
+    return false if y < 0 or y >= @height
+    @tiles[y * @width + x + 1]
+
+  -- final x,y coord
   each_xyt: =>
     coroutine.wrap ->
-      for i, t in ipairs @tiles
-        if t != 0
-          i -= 1
-          x = i % @width * @cell_size
-          y = math.floor(i / @width) * @cell_size
-          coroutine.yield x, y, t
+      for i=1,@count
+        t = @tiles[i]
+        i -= 1
+        x = i % @width
+        y = math.floor(i / @width)
+        coroutine.yield x, y, t, i
 
   draw: (viewport) =>
-    setColor @color
-    for block in *@get_candidates viewport.box
-      block\draw!
-
-    -- for x,y,t in @each_xyt!
-    --   count += 1
-    --   rectangle "fill", x, y, @cell_size, @cell_size
+    for tile in *@get_candidates viewport.box
+      tile\draw!
 
