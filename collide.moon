@@ -62,6 +62,9 @@ class Box
   unpack2: => @x, @y, @x + @w, @y + @h
 
   set_pos: (@x, @y) =>
+  move: (x, y) =>
+    @x += x
+    @y += y
 
   center: =>
     @x + @w / 2, @y + @h / 2

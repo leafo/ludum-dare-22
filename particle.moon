@@ -22,12 +22,16 @@ class DrawList
     item.alive = true
     self[i] = item
 
-  update: (dt) =>
-    for i, item in ipairs self
-      alive = item\update dt
-      if not alive
-        item.alive = false
-        insert @dead_list, i
+  update: (dt, ...) =>
+    i = 1
+    for item in *self
+      if item.alive
+        alive = item\update dt, ...
+        if not alive
+          item.alive = false
+          insert @dead_list, i
+
+      i += 1
 
   draw: =>
     for item in *self

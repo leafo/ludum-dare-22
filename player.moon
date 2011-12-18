@@ -6,7 +6,8 @@ export *
 
 class Player
   gravity: Vec2d 0, 20
-  speed: 300
+  speed: 200
+  bullet_speed: 400
   w: 14
   h: 30
   color: { 237, 139, 5 }
@@ -38,25 +39,19 @@ class Player
       .ox = 64
       .oy = 0
 
-    @bullets = DrawList!
-
   shoot: =>
-    speed = 400
     flip = @facing == "left"
 
-    v = Vec2d speed, 0
-
-    pos = @loc!
-    pos += Vec2d 0, 15
-
+    v = Vec2d @bullet_speed, 0
     v = v * -1 if flip
 
-    b = Bullet @bullet_sprite\seq({0,1}, 0.2, flip), pos, v
-    @bullets\add b
+    pos = @loc! + Vec2d 0, 15
+
+    b = Bullet @world, @bullet_sprite\seq({0,1}, 0.2, flip), pos, v
+    @world\add b
 
   update: (dt) =>
     @a\update dt
-    @bullets\update dt
 
     dx = if keyboard.isDown "left"
       @facing = "left"
@@ -112,22 +107,26 @@ class Player
     collided
 
   draw: =>
-    @box\draw @color
     setColor 255, 255, 255
     @a\draw @box.x, @box.y+1
-    @bullets\draw!
-
 
 class Bullet
-  new: (@anim, @o, @v) =>
-  update: (dt) =>
+  new: (@world, @anim, o, @v) =>
+    @box = Box o.x, o.y, @anim\get_width!, @anim\get_height!
+
+  update: (dt, world) =>
     @anim\update dt
-    @o += @v * dt
-    true
+    @box\move unpack @v * dt
+
+    if world\collides self
+      print "collides..."
+      false
+    else
+      true
 
   draw: =>
-    @anim\draw unpack @o
+    @anim\draw @box.x, @box.y
 
   __tostring: =>
-    ("bullet<%f, %f>")\format @o.x @o.y
+    ("bullet<%f, %f>")\format @box.x @box.y
 

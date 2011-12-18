@@ -1,4 +1,6 @@
 
+require "moon"
+
 import graphics from love
 import push, pop, scale, translate from graphics
 
@@ -22,7 +24,11 @@ class StateAnim
     @current\draw x, y
 
 class Animator
-  new: (@sprite, @sequence, @rate=0, @flip=false) => @reset!
+  get_width: => @sprite.cell_w
+  get_height: => @sprite.cell_h
+
+  new: (@sprite, @sequence, @rate=0, @flip=false) =>
+    @reset!
 
   reset: =>
     @time = 0

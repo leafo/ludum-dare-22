@@ -4,7 +4,7 @@
 
 require "moon"
 
-import p from moon
+import p, mixin_object from moon
 import rectangle, setColor, getColor from love.graphics
 import keyboard, graphics from love
 import insert from table
@@ -67,7 +67,11 @@ class Viewport
 
 class World
   gravity: 0.5
-  new: (@vx=0, @vy=0)=>
+  new: =>
+    @draw_list = DrawList!
+
+    mixin_object self, @draw_list, { "add" }
+
     @bgs = {
       Paralax "images/bg1.png", 0.5
       Paralax "images/bg2.png", 0.8, 0.9, {
@@ -98,27 +102,32 @@ class World
       return true if thing.box\touches_box tile_box
     false
 
+  update: (dt) =>
+    @draw_list\update dt, self
+
   draw: =>
     for bg in *@bgs
       bg\draw game.viewport
 
     @map\draw game.viewport
     @player\draw! if @player
+    @draw_list\draw!
+
     -- @show_collidable!
 
-bb = 0
+  __tostring: => "world<>"
 
 class Game
   new: =>
     @w = World!
     @viewport = Viewport!
     @player = Player @w, 100, 100
-
     @w\spawn_player @player
 
     @emitters = {}
 
   update: (dt) =>
+    @w\update dt
     @player\update dt
 
     for e in *@emitters
@@ -147,10 +156,6 @@ class Game
   keypressed: (key, code) =>
     if key == "lctrl"
       game.player\shoot!
-
-    if key == "n"
-      bb += 1
-      print "bb:", bb
 
     os.exit! if key == "escape"
 
