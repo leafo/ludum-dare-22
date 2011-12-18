@@ -21,7 +21,7 @@ class Vec2d
     Vec2d cos(theta), sin(theta)
 
   angle: =>
-    atan2 self[2], self[1]
+    math.deg atan2 self[2], self[1]
 
   new: (x=0, y=0) =>
     self[1] = x
@@ -31,6 +31,9 @@ class Vec2d
     n = self[1]^2 + self[2]^2
     return 0 if n == 0
     math.sqrt n
+
+  left: => return self[1] < 0
+  right: => return self[1] > 0
 
   normalized: =>
     len = @len!

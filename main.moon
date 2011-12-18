@@ -41,6 +41,10 @@ class Viewport
   new: =>
     @box = Box 0,0, screen.w, screen.h
 
+  bigger: =>
+    x,y,w,h = @box\unpack!
+    Box x - w/2, y - h/2, w*2,h*2
+
   apply: =>
     graphics.translate -@box.x, -@box.y
 

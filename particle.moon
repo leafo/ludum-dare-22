@@ -46,11 +46,14 @@ class DrawList
 class Particle
   __tostring: => ("particle<%s>")\format tostring @origin
 
-  new: (@origin, @velocity) =>
+  new: (@origin, @velocity, @acceleration) =>
 
   update: (dt) =>
     @origin += @velocity * dt
-    game.viewport.box\touches_pt unpack @origin
+    @velocity += @acceleration * dt
+
+    box = game.viewport\bigger!
+    box\touches_pt unpack @origin
 
   draw: =>
     rectangle "line", @origin[1], @origin[2], 4, 4
@@ -58,17 +61,14 @@ class Particle
 class Emitter extends DrawList
   new: (@x, @y) =>
     super!
-    print "created emitter"
     @angle = 60
-    @life = -1 -- 0 is forever
+    @life = -1 -- -1 is forever
     @direction = Vec2d 1, 0
+    @accel = Vec2d 0, 0
     @speed = 200
-    @rate = 0.05
+    @rate = 0.1
 
     @time = 0
-
-  onremove: =>
-    print "removing emitter"
 
   spawn_new: =>
     half = @angle/2
@@ -76,20 +76,22 @@ class Emitter extends DrawList
     angle = random angle - half, angle + half
     dir = Vec2d.from_angle(angle) * @speed
 
-    @add Particle Vec2d(@x, @y), dir
+    @add Particle Vec2d(@x, @y), dir, @accel
+
+  is_alive: =>
+    @life == -1 or @life > 0
 
   update: (dt, world) =>
     updated = super dt
 
     -- see if we can spawn new ones
-    if @life == -1 or @life > 0
-      @time += dt
-      if @time > @rate
-        @time -= @rate
-        @life -= 1 if @life > 0
-        @spawn_new!
-      true
-    else
-      updated
+    @time += dt
+    while @time > @rate and @is_alive!
+      updated = true
+      @time -= @rate
+      @life -= 1 if @life > 0
+      @spawn_new!
+
+    @is_alive! or updated
     
 

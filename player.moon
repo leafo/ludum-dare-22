@@ -119,6 +119,20 @@ class Bullet
     @box\move unpack @v * dt
 
     if world\collides self
+      -- create emitter
+      x, y = @box.x, @box.y
+
+      dx = -1
+      if @v\left!
+        x += @box.w
+        dx = 1
+
+      world\add with Emitter @box.x, @box.y
+        .direction = Vec2d dx, 0
+        .rate = 0.01
+        .accel = Vec2d 0, 800
+        .life = 4
+
       false
     else
       true
