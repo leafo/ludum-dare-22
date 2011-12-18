@@ -32,8 +32,8 @@ export smoothstep = (t) -> t*t*(3 - 2*t)
 
 require "collide"
 require "map"
-require "particle"
 require "spriter"
+require "particle"
 require "player"
 require "background"
 
@@ -145,6 +145,9 @@ class Game
     graphics.print tostring(@player), 10, 30
 
   keypressed: (key, code) =>
+    if key == "lctrl"
+      game.player\shoot!
+
     if key == "n"
       bb += 1
       print "bb:", bb

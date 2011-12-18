@@ -14,6 +14,8 @@ class Player
   __tostring: =>
     ("player<grounded: %s>")\format tostring @on_ground
 
+  loc: => Vec2d @box.x, @box.y
+
   new: (@world, x=0, y=0) =>
     @box = Box x, y, @w, @h
     @velocity = Vec2d 0, 0
@@ -31,8 +33,30 @@ class Player
       left_air: sprite\seq {3}, 0, true
     }
 
+    -- bullet
+    @bullet_sprite = with Spriter sprite.img, 16, 6, 1
+      .ox = 64
+      .oy = 0
+
+    @bullets = DrawList!
+
+  shoot: =>
+    speed = 400
+    flip = @facing == "left"
+
+    v = Vec2d speed, 0
+
+    pos = @loc!
+    pos += Vec2d 0, 15
+
+    v = v * -1 if flip
+
+    b = Bullet @bullet_sprite\seq({0,1}, 0.2, flip), pos, v
+    @bullets\add b
+
   update: (dt) =>
     @a\update dt
+    @bullets\update dt
 
     dx = if keyboard.isDown "left"
       @facing = "left"
@@ -88,7 +112,22 @@ class Player
     collided
 
   draw: =>
-    -- @box\draw @color
+    @box\draw @color
     setColor 255, 255, 255
     @a\draw @box.x, @box.y+1
+    @bullets\draw!
+
+
+class Bullet
+  new: (@anim, @o, @v) =>
+  update: (dt) =>
+    @anim\update dt
+    @o += @v * dt
+    true
+
+  draw: =>
+    @anim\draw unpack @o
+
+  __tostring: =>
+    ("bullet<%f, %f>")\format @o.x @o.y
 
