@@ -6,6 +6,56 @@ import rad, atan2, cos, sin from math
 
 export *
 
+class List
+  new: => @clear!
+
+  _node: (item) =>
+    error "list already contains item: " .. tostring item if @nodes[item]
+    n = { value: item }
+    @nodes[item] = n
+    n
+
+  _insert_after: (node, after_node) =>
+    nxt = after_node.next
+    node.prev = after_node
+    node.next = nxt
+    after_node.next = node
+    nxt.prev = node
+
+  _remove: (node) =>
+   node.prev.next = node.next
+   node.next.prev = node.prev
+
+  remove: (item) =>
+    n = @nodes[item]
+    if n
+      @nodes[item] = nil
+      @_remove n
+      true
+
+  clear: =>
+    @front = { next: nil }
+    @back = { prev: @front }
+    @front.next = @back
+    @nodes = {}
+
+  push: (item) =>
+    n = @_node item
+    @_insert_after n, @back.prev
+
+  shift: (item) =>
+    n = @_node item
+    @_insert_after n, @front
+
+  each: =>
+    coroutine.wrap ->
+      curr = @front.next
+      while curr != @back
+        coroutine.yield curr.value
+        curr = curr.next
+
+
+
 class Vec2d
   base = self.__base
   self.__base.__index = (name) =>
