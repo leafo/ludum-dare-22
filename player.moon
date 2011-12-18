@@ -119,7 +119,6 @@ class Bullet
     @box\move unpack @v * dt
 
     if world\collides self
-      print "collides..."
       false
     else
       true

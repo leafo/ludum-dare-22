@@ -124,15 +124,10 @@ class Game
     @player = Player @w, 100, 100
     @w\spawn_player @player
 
-    @emitters = {}
-
   update: (dt) =>
     return if @paused
     @w\update dt
     @player\update dt
-
-    for e in *@emitters
-      e\update dt
 
   draw: =>
     graphics.scale screen.scale, screen.scale
@@ -140,9 +135,6 @@ class Game
     @viewport\center_on @player
     @viewport\apply!
     @w\draw!
-
-    for e in *@emitters
-      e\draw!
 
     graphics.pop!
 
@@ -166,9 +158,10 @@ class Game
   mousepressed: (x, y, button) =>
     if button == "l"
       x, y = @viewport\unproject x,y
-      insert @emitters, Emitter x, y
-    else
-      @emitters = {}
+
+      @w\add with Emitter x, y
+        .life = 10
+
     nil
 
 
