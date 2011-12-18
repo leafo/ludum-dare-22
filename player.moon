@@ -35,25 +35,27 @@ class Entity
 
   loc: => Vec2d @box.x, @box.y
 
-  -- returns true if there was a y axis collision
   fit_move: (dx, dy) =>
-    collided = false
+    collided_x = false
+    collided_y = false
+
     dx = math.floor dx
     dy = math.floor dy
     if dx != 0
       ddx = dx < 0 and -1 or 1
       @box.x += dx
       while @world\collides self
+        collided_x = true
         @box.x -= ddx
 
     if dy != 0
       ddy = dy < 0 and -1 or 1
       @box.y += dy
       while @world\collides self
-        collided = true
+        collided_y = true
         @box.y -= ddy
 
-    collided
+    collided_y, collided_x
 
 class Player extends Entity
   speed: 200
