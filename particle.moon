@@ -47,6 +47,8 @@ class Particle
   __tostring: => ("particle<%s>")\format tostring @origin
 
   new: (@origin, @velocity, @acceleration) =>
+    @fill = "line"
+    @color = {255,255,255}
 
   update: (dt) =>
     @origin += @velocity * dt
@@ -56,11 +58,14 @@ class Particle
     box\touches_pt unpack @origin
 
   draw: =>
-    rectangle "line", @origin[1], @origin[2], 4, 4
+    setColor @color
+    rectangle @fill, @origin[1], @origin[2], 4, 4
 
 class Emitter extends DrawList
   new: (@x, @y) =>
     super!
+    @color = {255,255,255}
+    @fill = "line"
     @angle = 60
     @life = -1 -- -1 is forever
     @direction = Vec2d 1, 0
@@ -76,7 +81,9 @@ class Emitter extends DrawList
     angle = random angle - half, angle + half
     dir = Vec2d.from_angle(angle) * @speed
 
-    @add Particle Vec2d(@x, @y), dir, @accel
+    @add with Particle Vec2d(@x, @y), dir, @accel
+      .color = @color
+      .fill = @fill
 
   is_alive: =>
     @life == -1 or @life > 0

@@ -176,27 +176,37 @@ class Bullet
   new: (@world, @anim, o, @v) =>
     @box = Box o.x, o.y, @anim\get_width!, @anim\get_height!
 
+  emitter: =>
+    -- find direction
+    x, y = @box.x, @box.y
+    dx = -1
+    if @v\left!
+      x += @box.w
+      dx = 1
+
+    with Emitter x, y
+      .direction = Vec2d dx, 0
+      .rate = 0.01
+      .accel = Vec2d 0, 800
+      .life = 4
+      .angle = 80
+
   update: (dt, world) =>
     @anim\update dt
     @box\move unpack @v * dt
 
     if world\collides self
-      -- create emitter
-      x, y = @box.x, @box.y
-
-      dx = -1
-      if @v\left!
-        x += @box.w
-        dx = 1
-
-      world\add with Emitter @box.x, @box.y
-        .direction = Vec2d dx, 0
-        .rate = 0.01
-        .accel = Vec2d 0, 800
-        .life = 4
-
+      world\add @emitter!
       false
     else
+      -- try all the enemies
+      for e in world.enemies\each!
+        if e.box\touches_box @box
+          world\add with @emitter!
+            .color = {255, 64, 64}
+            .fill = "fill"
+          return false
+
       box = game.viewport\bigger!
       box\touches_pt @box.x, @box.y
 

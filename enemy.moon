@@ -76,6 +76,7 @@ class EnemySpawn
     rectangle "fill", @o.x, @o.y, 2,2
 
 class Enemy extends Entity
+  health: 100
   new: (...) =>
     super ...
 
