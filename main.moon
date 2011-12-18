@@ -36,6 +36,7 @@ require "spriter"
 require "particle"
 require "player"
 require "background"
+require "enemy"
 
 class Viewport
   new: =>
@@ -68,9 +69,8 @@ class Viewport
     @box.x = max_x if @box.x > max_x
     @box.y = max_y if @box.y > max_y
 
-
 class World
-  gravity: 0.5
+  gravity: Vec2d 0, 1000
   new: =>
     @draw_list = DrawList!
 
@@ -83,7 +83,7 @@ class World
         oy: 1210
       }
     }
-    @map = Map.from_image "images/map1.png", "images/tiles.png"
+    @map = Map.from_image "images/small.png", "images/tiles.png"
 
     @overlay = (y) ->
       p = y / @map.real_height
@@ -116,7 +116,6 @@ class World
     @map\draw game.viewport
     @player\draw! if @player
     @draw_list\draw!
-
     -- @show_collidable!
 
   __tostring: => "world<>"
@@ -160,8 +159,12 @@ class Game
     os.exit! if key == "escape"
 
   mousepressed: (x, y, button) =>
+    x, y = @viewport\unproject x,y
+
     if button == "l"
-      x, y = @viewport\unproject x,y
+      @w\add EnemySpawn Vec2d(x,y), 3
+
+    if button == "r"
 
       @w\add with Emitter x, y
         .life = 10

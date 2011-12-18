@@ -4,8 +4,55 @@ import keyboard, graphics from love
 
 export *
 
-class Player
-  gravity: Vec2d 0, 20
+class Entity
+  w: 20
+  h: 20
+
+  new: (@world, x, y) =>
+    @facing = "right"
+    @on_ground = false
+    @velocity = Vec2d 0, 0
+    @box = Box x, y, @w, @h
+
+  update: (dt) =>
+    @velocity += @world.gravity * dt
+    collided = @fit_move unpack @velocity * dt
+
+    if collided
+      if @velocity[2] > 0
+        @on_ground = true
+      @velocity[2] = 0
+    else
+      if math.floor(@velocity.y) != 0
+        @on_ground = false
+
+    @facing = "left" if @velocity\left!
+    @facing = "right" if @velocity\right!
+    true
+
+  loc: => Vec2d @box.x, @box.y
+
+  -- returns true if there was a y axis collision
+  fit_move: (dx, dy) =>
+    collided = false
+    dx = math.floor dx
+    dy = math.floor dy
+    if dx != 0
+      ddx = dx < 0 and -1 or 1
+      @box.x += dx
+      while @world\collides self
+        @box.x -= ddx
+
+    if dy != 0
+      ddy = dy < 0 and -1 or 1
+      @box.y += dy
+      while @world\collides self
+        collided = true
+        @box.y -= ddy
+
+    collided
+
+class Player extends Entity
   speed: 200
   bullet_speed: 400
   w: 14
@@ -15,11 +62,8 @@ class Player
   __tostring: =>
     ("player<grounded: %s>")\format tostring @on_ground
 
-  loc: => Vec2d @box.x, @box.y
-
-  new: (@world, x=0, y=0) =>
-    @box = Box x, y, @w, @h
-    @velocity = Vec2d 0, 0
+  new: (world, x=0, y=0) =>
+    super world, x, y
 
     @on_ground = false
     @facing = "right"
@@ -63,9 +107,9 @@ class Player
       0
   
     if @on_ground and keyboard.isDown " "
-      @velocity[2] = -400
+      @velocity[2] = -300
     else
-      @velocity += @gravity
+      @velocity += @world.gravity * dt
 
     delta = Vec2d dx*@speed, 0
     delta += @velocity
@@ -85,26 +129,6 @@ class Player
       state = state.."_air"
 
     @a\set_state state
-
-  -- returns true if there was a y axis collision
-  fit_move: (dx, dy) =>
-    collided = false
-    dx = math.floor dx
-    dy = math.floor dy
-    if dx != 0
-      ddx = dx < 0 and -1 or 1
-      @box.x += dx
-      while @world\collides self
-        @box.x -= ddx
-
-    if dy != 0
-      ddy = dy < 0 and -1 or 1
-      @box.y += dy
-      while @world\collides self
-        collided = true
-        @box.y -= ddy
-
-    collided
 
   draw: =>
     setColor 255, 255, 255
