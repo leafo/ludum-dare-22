@@ -159,9 +159,11 @@ class Bullet
 
       false
     else
-      true
+      box = game.viewport\bigger!
+      box\touches_pt @box.x, @box.y
 
   draw: =>
+    setColor 255, 255, 255, 255
     @anim\draw @box.x, @box.y
 
   __tostring: =>

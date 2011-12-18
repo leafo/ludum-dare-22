@@ -9,10 +9,11 @@ import rectangle, setColor, getColor from love.graphics
 import keyboard, graphics from love
 import insert from table
 
-export game
+export game, screen
 
 scale = 2
 screen = {
+  padding: 8
   scale: scale
   w: 800/scale
   h: 400/scale
@@ -37,6 +38,7 @@ require "particle"
 require "player"
 require "background"
 require "enemy"
+require "ui"
 
 class Viewport
   new: =>
@@ -127,6 +129,8 @@ class Game
     @player = Player @w, 100, 100
     @w\spawn_player @player
 
+    @health_bar = HealthBar!
+
   update: (dt) =>
     return if @paused
     @w\update dt
@@ -140,6 +144,8 @@ class Game
     @w\draw!
 
     graphics.pop!
+
+    @health_bar\draw!
 
     @w.overlay @player.box.y
 
