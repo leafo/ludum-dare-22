@@ -27,3 +27,31 @@ class HealthBar
     rectangle "fill",
       ox, oy, @width * @value, @height
 
+
+class GameState
+  attach: (love) =>
+    love.update = self\update
+    love.draw = self\draw
+    love.keypressed = self\keypressed
+    love.mousepressed = self\mousepressed
+    -- love.keyreleased = g\keyreleased
+
+  update: =>
+  draw: =>
+  keypressed: =>
+  mousepressed: =>
+
+
+class Menu extends GameState
+
+  new: =>
+    @title = imgfy "images/title.png"
+
+  draw: =>
+    graphics.scale screen.scale, screen.scale
+    graphics.draw @title, 0, 0
+
+  keypressed: (key, code) =>
+    Game.start! if key == "return"
+    os.exit! if key == "escape"
+

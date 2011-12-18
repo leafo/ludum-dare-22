@@ -10,6 +10,7 @@ import keyboard, graphics from love
 import insert from table
 
 export game, screen
+export ^
 
 scale = 2
 screen = {
@@ -136,7 +137,11 @@ class World
 
   __tostring: => "world<>"
 
-class Game
+class Game extends GameState
+  @start = ->
+    game = Game!
+    game\attach love
+
   flash_duration: 0.1
 
   new: =>
@@ -156,6 +161,8 @@ class Game
     if @flash
       @flash.time -= dt
       @flash = nil if @flash.time < 0
+
+    @health_bar.value = @player.health / @player.max_health
 
     @w\update dt
     @player\update dt
@@ -207,14 +214,7 @@ class Game
 
     nil
 
-
 love.load = ->
-  g = Game!
-  love.update = g\update
-  love.draw = g\draw
-  love.keypressed = g\keypressed
-  love.mousepressed = g\mousepressed
-
-  game = g
-  -- love.keyreleased = g\keyreleased
+  game = Menu!
+  game\attach love
 

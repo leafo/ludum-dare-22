@@ -74,6 +74,8 @@ class Entity
     collided_y, collided_x
 
 class Player extends Entity
+  max_health: 100
+
   speed: 200
   bullet_speed: 400
   w: 14
@@ -85,6 +87,8 @@ class Player extends Entity
 
   new: (world, x=0, y=0) =>
     super world, x, y
+
+    @health = @max_health
 
     @x_knock = 0
 
@@ -109,6 +113,8 @@ class Player extends Entity
   onhit: (enemy) =>
     super enemy
     game\flash_screen {255, 0 ,0}
+    @health -= 20
+    @health = 0 if @health < 0
 
   shoot: =>
     flip = @facing == "left"
