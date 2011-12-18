@@ -100,7 +100,7 @@ class World
         oy: 1210
       }
     }
-    @map = Map.from_image "images/small.png", "images/tiles.png"
+    @map = Map.from_image "images/map1.png", "images/tiles.png"
 
     @overlay = (y) ->
       p = y / @map.real_height
@@ -189,8 +189,8 @@ class Game extends GameState
     setColor {255,255,255}
 
     graphics.print tostring(love.timer.getFPS!), 10, 10
-    graphics.print tostring(@player.box), 10, 20
-    graphics.print tostring(@player), 10, 30
+    -- graphics.print tostring(@player.box), 10, 20
+    -- graphics.print tostring(@player), 10, 30
 
   keypressed: (key, code) =>
     if key == "lctrl"
