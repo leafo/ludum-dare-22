@@ -84,7 +84,6 @@ class World
 
   add: (item) =>
     if item.type == "enemy"
-      print "adding enemy"
       @enemies\push item
 
     @draw_list\add item
@@ -138,6 +137,8 @@ class World
   __tostring: => "world<>"
 
 class Game
+  flash_duration: 0.1
+
   new: =>
     @w = World!
     @viewport = Viewport!
@@ -146,8 +147,16 @@ class Game
 
     @health_bar = HealthBar!
 
+  flash_screen: (color) =>
+    @flash = { :color, time: @flash_duration }
+
   update: (dt) =>
     return if @paused
+
+    if @flash
+      @flash.time -= dt
+      @flash = nil if @flash.time < 0
+
     @w\update dt
     @player\update dt
 
@@ -163,6 +172,12 @@ class Game
     @health_bar\draw!
 
     @w.overlay @player.box.y
+
+    if @flash
+      a = @flash.time / @flash_duration * 128
+      r,g,b = unpack @flash.color
+      setColor r, g, b, a
+      rectangle "fill", 0,0, screen.w, screen.h
 
     setColor {255,255,255}
 

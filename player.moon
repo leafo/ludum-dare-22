@@ -8,6 +8,7 @@ cool_down = 1.0
 knock_back = 200
 
 class Entity
+  flash_duration: 0.1
   w: 20
   h: 20
 
@@ -29,9 +30,23 @@ class Entity
       if math.floor(@velocity[2] * dt) != 0
         @on_ground = false
 
+    if @hit_time
+      @hit_time -= dt
+      @hit_time = nil if @hit_time < 0
+
     true
 
   loc: => Vec2d @box.x, @box.y
+
+  set_color: =>
+    other = if @hit_time
+      math.floor 255 * (1 - @hit_time / @flash_duration)
+    else
+      255
+    setColor 255, other, other, 255
+
+  onhit: =>
+    @hit_time = @flash_duration
 
   fit_move: (dx, dy) =>
     collided_x = false
@@ -91,6 +106,10 @@ class Player extends Entity
       .ox = 64
       .oy = 0
 
+  onhit: (enemy) =>
+    super enemy
+    game\flash_screen {255, 0 ,0}
+
   shoot: =>
     flip = @facing == "left"
 
@@ -114,16 +133,20 @@ class Player extends Entity
     else
       0
   
+    if @hit_time
+      @hit_time -= dt
+      @hit_time = nil if @hit_time < 0
+
     -- see if we are hitting an enemy
     for e in @world.enemies\each!
       if not e.immune and e.box\touches_box @box
+        @onhit e
         e.immune = cool_down
         @velocity[2] = -200
         @x_knock = if @box\left_of e.box
           -knock_back
         else
           knock_back
-
 
     if @on_ground and keyboard.isDown " "
       @velocity[2] = -300
@@ -170,7 +193,7 @@ class Player extends Entity
     @a\set_state state
 
   draw: =>
-    setColor 255, 255, 255
+    @set_color!
     @a\draw @box.x, @box.y+1
 
 class Bullet
@@ -203,10 +226,15 @@ class Bullet
       -- try all the enemies
       for e in world.enemies\each!
         if e.box\touches_box @box
-          e\onhit self
-          world\add with @emitter!
-            .color = {255, 64, 64}
-            .fill = "fill"
+          if e\onhit self
+            world\add with @emitter!
+              .color = {255, 64, 64}
+              .fill = "fill"
+              .direction = Vec2d 0, -1
+          else
+            world\add with @emitter!
+              .color = {255, 64, 64}
+              .fill = "fill"
           return false
 
       box = game.viewport\bigger!

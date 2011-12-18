@@ -66,28 +66,28 @@ class EnemySpawn
     mixin_object self, @repeater, { "update" }
 
   spawn: (world) =>
-    if not @added
-      @added = true
-      world\add Slime world, @o.x, @o.y
+    if @current
+      if not @current.alive
+        @current = nil
+    else
+      @current = Slime world, @o.x, @o.y
+      world\add @current
 
   draw: =>
     setColor {255, 0, 0}
     rectangle "fill", @o.x, @o.y, 2,2
 
 class Enemy extends Entity
-  flash_duration: 0.1
   type: "enemy"
   health: 100
 
   onhit: =>
     @hit_time = @flash_duration
+    @health -= 44
+    return @health < 0
 
-  set_color: =>
-    other = if @hit_time
-      math.floor 255 * (1 - @hit_time / @flash_duration)
-    else
-      255
-    setColor 255, other, other, 255
+  onremove: =>
+    game.w.enemies\remove self
 
   new: (...) =>
     super ...
@@ -109,9 +109,8 @@ class Enemy extends Entity
   update: (dt, world) =>
     super dt, world
 
-    if @hit_time
-      @hit_time -= dt
-      @hit_time = nil if @hit_time < 0
+    if @health < 0
+      return false
 
     if @immune
       @immune -= dt
@@ -135,14 +134,13 @@ class Slime extends Enemy
     }
 
   update: (dt, world) =>
-    super dt, world
-
     state = @facing
     state = state .. "_air" if not @on_ground
     @a\set_state state
 
     @a\update dt
-    true
+
+    super dt, world
 
   draw: =>
     @set_color!
