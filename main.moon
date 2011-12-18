@@ -100,7 +100,7 @@ class World
         oy: 1210
       }
     }
-    @map = Map.from_image "images/map1.png", "images/tiles.png"
+    @map = Map.from_image "images/small.png", "images/tiles.png"
 
     @overlay = (y) ->
       p = y / @map.real_height
@@ -113,6 +113,7 @@ class World
   spawn_player: (@player) =>
     if @map.spawn
       @player.box\set_pos unpack @map.spawn
+      @player.velocity = Vec2d 0, 0
 
   show_collidable: =>
     for box in *@map\get_candidates @player.box
@@ -138,16 +139,16 @@ class World
   __tostring: => "world<>"
 
 class Game extends GameState
-  @start = ->
-    game = Game!
-    game\attach love
-
   flash_duration: 0.1
+  freeze: false
+
+  __tostring: => "Game<>"
 
   new: =>
+    game = self
     @w = World!
     @viewport = Viewport!
-    @player = Player @w, 100, 100
+    @player = Player @w, 0, 0
     @w\spawn_player @player
 
     @health_bar = HealthBar!
@@ -198,6 +199,10 @@ class Game extends GameState
 
     if key == "p"
       @paused = not @paused
+
+    if key == "x"
+      print "DIE"
+      @player\die!
 
     os.exit! if key == "escape"
 

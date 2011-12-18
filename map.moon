@@ -32,6 +32,11 @@ style = {
     bottom: 5
   }
 
+  door: {
+    top: 19
+    bottom: 27
+  }
+
   inside: {
     back: 9
     top: 10
@@ -114,6 +119,17 @@ tile_types = {
         elseif r > 0.96
           style.inside.decor2
   }
+
+  ["99-255-99"]: {
+    layer: 0
+    sid: style.door.top
+  }
+
+  ["99-174-99"]: {
+    layer: 0
+    sid: style.door.bottom
+  }
+
 
   ["255-0-0"]: { spawn: true }
 }

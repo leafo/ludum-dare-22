@@ -110,11 +110,35 @@ class Player extends Entity
       .ox = 64
       .oy = 0
 
+  die: =>
+    @alive = false
+
+    @world\add with Emitter @box\center!
+      .direction = Vec2d 0, -1
+      .angle = 120
+      .rate = 0.05
+      .color = {255,255,255}
+      .accel = Vec2d 0, 400
+      .life = 15
+
+    @world\add with Emitter @box\center!
+      .direction = Vec2d 0, -1
+      .rate = 0.01
+      .accel = Vec2d 0, 800
+      .life = 100
+      .angle = 180
+      .color = {255, 64, 64}
+      .fill = "fill"
+
+    GameOver(game)\attach love
+
   onhit: (enemy) =>
     super enemy
     game\flash_screen {255, 0 ,0}
     @health -= 20
     @health = 0 if @health < 0
+
+    @die!  if @health == 0
 
   shoot: =>
     flip = @facing == "left"
@@ -138,6 +162,8 @@ class Player extends Entity
       1
     else
       0
+
+    dx = 0 if game.freeze
   
     if @hit_time
       @hit_time -= dt
@@ -153,11 +179,12 @@ class Player extends Entity
           -knock_back
         else
           knock_back
-
-    if @on_ground and keyboard.isDown " "
-      @velocity[2] = -300
-    else
-      @velocity += @world.gravity * dt
+            
+    if not game.freeze
+      if @on_ground and keyboard.isDown " "
+        @velocity[2] = -300
+      else
+        @velocity += @world.gravity * dt
 
     speed = @speed
     speed /= 1.2 if not @on_ground
@@ -199,8 +226,9 @@ class Player extends Entity
     @a\set_state state
 
   draw: =>
-    @set_color!
-    @a\draw @box.x, @box.y+1
+    if @alive != false
+      @set_color!
+      @a\draw @box.x, @box.y+1
 
 class Bullet
   new: (@world, @anim, o, @v) =>

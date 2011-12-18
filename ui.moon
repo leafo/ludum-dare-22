@@ -42,8 +42,40 @@ class GameState
   mousepressed: =>
 
 
-class Menu extends GameState
+class GameOver extends GameState
+  timeout: 2.0
 
+  new: (@game) =>
+    @game.freeze = true
+    @time = @timeout
+
+  update: (dt) =>
+    if @time > 0
+      @time -= dt
+      @game\update dt
+    else
+      @game = nil
+
+  keypressed: (key) =>
+    Menu!\attach love if key == "return"
+    os.exit! if key == "escape"
+
+  draw: =>
+    if @time > 0
+      setColor 255,255,255, 255
+      @game\draw!
+      a = 255 * (1 - @time / @timeout)
+
+      setColor 0,0,0, a
+      rectangle "fill", 0, 0, screen.w, screen.h
+    else
+      setColor 200,200,200, 255
+      graphics.print "Game over", 100, 100
+      setColor 128, 128, 128
+      graphics.print "Press Enter to go to menu", 100, 120
+      setColor 255,255,255
+
+class Menu extends GameState
   new: =>
     @title = imgfy "images/title.png"
 
@@ -51,7 +83,12 @@ class Menu extends GameState
     graphics.scale screen.scale, screen.scale
     graphics.draw @title, 0, 0
 
+  update: (dt) =>
+    if @game
+      print "load time:", dt
+      @game\attach love
+
   keypressed: (key, code) =>
-    Game.start! if key == "return"
+    @game = Game! if key == "return"
     os.exit! if key == "escape"
 
