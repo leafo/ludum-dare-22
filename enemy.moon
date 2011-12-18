@@ -75,8 +75,20 @@ class EnemySpawn
     rectangle "fill", @o.x, @o.y, 2,2
 
 class Enemy extends Entity
+  flash_duration: 0.1
   type: "enemy"
   health: 100
+
+  onhit: =>
+    @hit_time = @flash_duration
+
+  set_color: =>
+    other = if @hit_time
+      math.floor 255 * (1 - @hit_time / @flash_duration)
+    else
+      255
+    setColor 255, other, other, 255
+
   new: (...) =>
     super ...
 
@@ -96,6 +108,10 @@ class Enemy extends Entity
 
   update: (dt, world) =>
     super dt, world
+
+    if @hit_time
+      @hit_time -= dt
+      @hit_time = nil if @hit_time < 0
 
     if @immune
       @immune -= dt
@@ -117,7 +133,7 @@ class Slime extends Enemy
       right_air: sprite\seq {3}, 0.2
       left_air: sprite\seq {3}, 0.2, true
     }
-  
+
   update: (dt, world) =>
     super dt, world
 
@@ -129,7 +145,7 @@ class Slime extends Enemy
     true
 
   draw: =>
-    setColor 255, 255, 255, 255
+    @set_color!
     @a\draw @box.x, @box.y
 
 

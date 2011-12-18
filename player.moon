@@ -29,9 +29,6 @@ class Entity
       if math.floor(@velocity[2] * dt) != 0
         @on_ground = false
 
-
-    print "facing:", @velocity\left!, @velocity\right!
-
     true
 
   loc: => Vec2d @box.x, @box.y
@@ -206,6 +203,7 @@ class Bullet
       -- try all the enemies
       for e in world.enemies\each!
         if e.box\touches_box @box
+          e\onhit self
           world\add with @emitter!
             .color = {255, 64, 64}
             .fill = "fill"
