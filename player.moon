@@ -76,7 +76,7 @@ class Entity
 class Player extends Entity
   max_health: 100
 
-  speed: 200
+  speed: 400
   bullet_speed: 400
   w: 14
   h: 30
