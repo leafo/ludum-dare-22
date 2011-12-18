@@ -78,6 +78,10 @@ class Map
 
     @min_layer, @max_layer = nil
 
+    -- pixel size of the map
+    @real_width = @width * @cell_size
+    @real_height = @height * @cell_size
+
     @layers = {}
 
     ground = {}

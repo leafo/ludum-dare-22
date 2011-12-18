@@ -54,6 +54,17 @@ class Viewport
     @box.x = cx - @box.w / 2
     @box.y = cy - @box.h / 2
 
+
+    @box.x = 0 if @box.x < 0
+    @box.y = 0 if @box.y < 0
+
+    max_x = game.w.map.real_width - @box.w
+    max_y = game.w.map.real_height - @box.h
+
+    @box.x = max_x if @box.x > max_x
+    @box.y = max_y if @box.y > max_y
+
+
 class World
   gravity: 0.5
   new: (@vx=0, @vy=0)=>
@@ -67,7 +78,7 @@ class World
     @map = Map.from_image "images/map1.png", "images/tiles.png"
 
     @overlay = (y) ->
-      p = y / (@map.height * @map.cell_size)
+      p = y / @map.real_height
       if p > 0.5
         a = smoothstep (p - 0.5) * 2
         a = math.floor a * 255
