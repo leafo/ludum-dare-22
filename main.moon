@@ -28,6 +28,8 @@ export imgfy = (img) ->
   img = graphics.newImage img if "string" == type img
   img
 
+export smoothstep = (t) -> t*t*(3 - 2*t)
+
 require "collide"
 require "map"
 require "particle"
@@ -62,7 +64,15 @@ class World
         oy: 1210
       }
     }
-    @map = Map.from_image "images/small.png", "images/tiles.png"
+    @map = Map.from_image "images/map1.png", "images/tiles.png"
+
+    @overlay = (y) ->
+      p = y / (@map.height * @map.cell_size)
+      if p > 0.5
+        a = smoothstep (p - 0.5) * 2
+        a = math.floor a * 255
+        setColor 255,255,255,a
+        @map.sprite\draw_sized 8, 0,0, screen.w, screen.h
 
   spawn_player: (@player) =>
     if @map.spawn
@@ -84,6 +94,8 @@ class World
     @map\draw game.viewport
     @player\draw! if @player
     -- @show_collidable!
+
+bb = 0
 
 class Game
   new: =>
@@ -113,6 +125,8 @@ class Game
 
     graphics.pop!
 
+    @w.overlay @player.box.y
+
     setColor {255,255,255}
 
     graphics.print tostring(love.timer.getFPS!), 10, 10
@@ -120,6 +134,10 @@ class Game
     graphics.print tostring(@player), 10, 30
 
   keypressed: (key, code) =>
+    if key == "n"
+      bb += 1
+      print "bb:", bb
+
     os.exit! if key == "escape"
 
   mousepressed: (x, y, button) =>

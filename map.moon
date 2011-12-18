@@ -11,6 +11,7 @@ export *
 
 style = {
   dirt: 0
+  hot: 3
   surface: 1
   behind: 2
 }
@@ -23,6 +24,12 @@ tile_types = {
     sid: style.dirt
     layer: 1
   }
+
+  ["107-0-3"]: {
+    sid: style.hot
+    layer: 1
+  }
+
   ["198-132-49"]: {
     sid: style.behind
     layer: 0
@@ -38,7 +45,7 @@ class Tile extends Box
 class Map
   cell_size: 16
 
-  self.from_image = (fname, tile_image) ->
+  self.from_image = (fname, tile_image, num_x=8) ->
     data = love.image.newImageData fname
     width, height = data\getWidth!, data\getHeight!
 
@@ -61,7 +68,7 @@ class Map
         len += 1
 
     with Map width, height, tiles
-      .sprite = Spriter tile_image, .cell_size, .cell_size
+      .sprite = Spriter tile_image, .cell_size, .cell_size, num_x
       .spawn = {spawn[1] * .cell_size, spawn[2] * .cell_size}
 
 

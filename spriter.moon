@@ -53,7 +53,7 @@ class Spriter
 
   seq: (...) => Animator self, ...
 
-  draw_cell: (i, x, y, flip=false) =>
+  quad_for: (i) =>
     if not @quads[i]
       sx, sy = if @width == 0
         @ox + i * @cell_w, @oy
@@ -62,17 +62,31 @@ class Spriter
 
       @quads[i] = graphics.newQuad sx, sy, @cell_w, @cell_h, @iw, @ih
 
+    @quads[i]
+
+  draw_sized: (i, x,y, w,h) =>
+    q = @quad_for i
+
+    sx = w / @cell_w
+    sy = h / @cell_h
+    graphics.drawq @img, q, x, y, 0, sx, sy
+
+    nil
+
+  draw_cell: (i, x, y, flip=false) =>
+    q = @quad_for i
+
     if flip
       push!
       translate x, y
       translate @cell_w, 0
       scale -1, 1
 
-      graphics.drawq @img, @quads[i], 0, 0
+      graphics.drawq @img, q, 0, 0
 
       pop!
     else
-      graphics.drawq @img, @quads[i], x, y
+      graphics.drawq @img, q, x, y
 
     nil
 
