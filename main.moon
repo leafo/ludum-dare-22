@@ -125,7 +125,11 @@ class World
     false
 
   update: (dt) =>
-    @draw_list\update dt, self
+    -- see if we won
+    if not game.freeze and @map\is_winning @player
+      Victory(game)\attach love
+    else
+      @draw_list\update dt, self
 
   draw: =>
     for bg in *@bgs

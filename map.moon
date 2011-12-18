@@ -7,6 +7,7 @@ require "collide"
 import rectangle, setColor, getColor from love.graphics
 import mixin_object from moon
 import random from math
+import insert from table
 
 export *
 
@@ -123,11 +124,13 @@ tile_types = {
   ["99-255-99"]: {
     layer: 0
     sid: style.door.top
+    auto: (x,y) => insert @win_blocks, {x,y}
   }
 
   ["99-174-99"]: {
     layer: 0
     sid: style.door.bottom
+    auto: (x,y) => insert @win_blocks, {x,y}
   }
 
 
@@ -180,6 +183,8 @@ class Map
     @real_width = @width * @cell_size
     @real_height = @height * @cell_size
 
+    @win_blocks = {}
+
     -- do the autotiles
     for x,y,t,i in @each_xyt!
       if t and t.auto
@@ -200,16 +205,19 @@ class Map
         @layers[t.layer] = layer!  if not @layers[t.layer]
         @layers[t.layer]\add box
 
-    -- -- color the tiles
-    -- for x,y,t in @each_xyt ground
-    --   if t
-    --     above = ground[@to_i x, y - 1]
-    --     if above == nil
-    --       t.sid = style.surface
+    
+    @win_blocks = for coord in *@win_blocks
+      x,y = unpack coord
+      Box x * @cell_size, y * @cell_size, @cell_size, @cell_size
 
     print "min:", @min_layer, "max:", @max_layer
     @solid = @layers[1]
     mixin_object self, @solid, {"get_candidates"}
+
+  is_winning: (thing) =>
+    for b in *@win_blocks
+      return true if b\touches_box thing.box
+    false
  
   to_xy: (i) =>
     i -= i

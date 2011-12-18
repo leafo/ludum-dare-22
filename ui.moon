@@ -42,7 +42,7 @@ class GameState
   mousepressed: =>
 
 
-class GameOver extends GameState
+class FadeOut extends GameState
   timeout: 2.0
 
   new: (@game) =>
@@ -55,10 +55,7 @@ class GameOver extends GameState
       @game\update dt
     else
       @game = nil
-
-  keypressed: (key) =>
-    Menu!\attach love if key == "return"
-    os.exit! if key == "escape"
+      @real_update dt if @real_update
 
   draw: =>
     if @time > 0
@@ -69,17 +66,34 @@ class GameOver extends GameState
       setColor 0,0,0, a
       rectangle "fill", 0, 0, screen.w, screen.h
     else
-      setColor 200,200,200, 255
-      graphics.print "Game over", 100, 100
-      setColor 128, 128, 128
-      graphics.print "Press Enter to go to menu", 100, 120
-      setColor 255,255,255
+      @real_draw! if @real_draw
+
+class GameOver extends FadeOut
+  keypressed: (key) =>
+    Menu!\attach love if key == "return"
+    os.exit! if key == "escape"
+
+  real_draw: =>
+    setColor 200,200,200, 255
+    graphics.print "Game over", 100, 100
+    setColor 128, 128, 128
+    graphics.print "Press Enter to go to menu", 100, 120
+    setColor 255,255,255
+
+class Victory extends GameOver
+  real_draw: =>
+    setColor 200,200,200, 255
+    graphics.print "You win", 100, 100
+    setColor 128, 128, 128
+    graphics.print "Press Enter to go to menu", 100, 120
+    setColor 255,255,255
 
 class Menu extends GameState
   new: =>
     @title = imgfy "images/title.png"
 
   draw: =>
+    setColor 255,255,255,255
     graphics.scale screen.scale, screen.scale
     graphics.draw @title, 0, 0
 
