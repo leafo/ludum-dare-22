@@ -26,11 +26,12 @@ class Entity
         @on_ground = true
       @velocity[2] = 0
     else
-      if math.floor(@velocity.y) != 0
+      if math.floor(@velocity[2] * dt) != 0
         @on_ground = false
 
-    @facing = "left" if @velocity\left!
-    @facing = "right" if @velocity\right!
+
+    print "facing:", @velocity\left!, @velocity\right!
+
     true
 
   loc: => Vec2d @box.x, @box.y
@@ -38,6 +39,9 @@ class Entity
   fit_move: (dx, dy) =>
     collided_x = false
     collided_y = false
+
+    @facing = "right" if dx > 0
+    @facing = "left" if dx < 0
 
     dx = math.floor dx
     dy = math.floor dy

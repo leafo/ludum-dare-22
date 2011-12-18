@@ -25,8 +25,16 @@ graphics.newImage = (...) ->
   with _newImage ...
     \setFilter "nearest", "nearest"
 
+image_cache = {}
 export imgfy = (img) ->
-  img = graphics.newImage img if "string" == type img
+  if "string" == type img
+    cached = image_cache[img]
+    img = if not cached
+      new = graphics.newImage img
+      image_cache[img] = new
+      new
+    else
+      cached
   img
 
 export smoothstep = (t) -> t*t*(3 - 2*t)
@@ -75,7 +83,7 @@ class World
   gravity: Vec2d 0, 1000
 
   add: (item) =>
-    if Enemy == moon.type item
+    if item.type == "enemy"
       print "adding enemy"
       @enemies\push item
 

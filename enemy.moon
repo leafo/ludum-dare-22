@@ -10,7 +10,6 @@ export *
 
 actions = {
   wait: (time) ->
-    -- print "waiting", time
     (dt, world) =>
       time -= dt
       time < 0
@@ -69,13 +68,14 @@ class EnemySpawn
   spawn: (world) =>
     if not @added
       @added = true
-      world\add Enemy world, @o.x, @o.y
+      world\add Slime world, @o.x, @o.y
 
   draw: =>
     setColor {255, 0, 0}
     rectangle "fill", @o.x, @o.y, 2,2
 
 class Enemy extends Entity
+  type: "enemy"
   health: 100
   new: (...) =>
     super ...
@@ -104,5 +104,33 @@ class Enemy extends Entity
 
     @act\update dt, world
     true
+
+
+class Slime extends Enemy
+  new: (...) =>
+    super ...
+
+    sprite = Spriter "images/enemy.png", 20, 20, 3
+    @a = StateAnim "right", {
+      right: sprite\seq {0, 1}, 0.2
+      left: sprite\seq {0, 1}, 0.2, true
+      right_air: sprite\seq {3}, 0.2
+      left_air: sprite\seq {3}, 0.2, true
+    }
+  
+  update: (dt, world) =>
+    super dt, world
+
+    state = @facing
+    state = state .. "_air" if not @on_ground
+    @a\set_state state
+
+    @a\update dt
+    true
+
+  draw: =>
+    setColor 255, 255, 255, 255
+    @a\draw @box.x, @box.y
+
 
 
