@@ -127,6 +127,7 @@ class Game
     @emitters = {}
 
   update: (dt) =>
+    return if @paused
     @w\update dt
     @player\update dt
 
@@ -155,7 +156,10 @@ class Game
 
   keypressed: (key, code) =>
     if key == "lctrl"
-      game.player\shoot!
+      @player\shoot!
+
+    if key == "p"
+      @paused = not @paused
 
     os.exit! if key == "escape"
 
