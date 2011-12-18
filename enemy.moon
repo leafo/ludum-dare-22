@@ -23,7 +23,9 @@ class EnemySpawn
     mixin_object self, @repeater, { "update" }
 
   spawn: (world) =>
-    world\add Enemy world, @o.x, @o.y
+    if not @added
+      @added = true
+      world\add Enemy world, @o.x, @o.y
 
   draw: =>
     setColor {255, 0, 0}
@@ -31,6 +33,19 @@ class EnemySpawn
 
 class Enemy extends Entity
   draw: =>
-    @box\draw {255, 100, 187}
+    @box\draw {255, @immune and 255 or 100, 187}
+
+  update: (dt, world) =>
+    super dt, world
+
+    if @immune
+      @immune -= dt
+      if @immune < 0
+        @immune = nil
+
+    -- if @on_ground
+    --   print "I AM ON GROUND"
+
+    true
 
 

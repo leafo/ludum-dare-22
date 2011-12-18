@@ -54,8 +54,6 @@ class List
         coroutine.yield curr.value
         curr = curr.next
 
-
-
 class Vec2d
   base = self.__base
   self.__base.__index = (name) =>
@@ -135,6 +133,10 @@ class Box
     return false if y2 < oy1
     return false if y1 > oy2
     true
+
+  -- is self left of box
+  left_of: (box) =>
+    self.x < box.x
 
   draw: (color=nil) =>
     setColor color if color

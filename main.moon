@@ -73,10 +73,17 @@ class Viewport
 
 class World
   gravity: Vec2d 0, 1000
+
+  add: (item) =>
+    if Enemy == moon.type item
+      print "adding enemy"
+      @enemies\push item
+
+    @draw_list\add item
+
   new: =>
     @draw_list = DrawList!
-
-    mixin_object self, @draw_list, { "add" }
+    @enemies = List!
 
     @bgs = {
       Paralax "images/bg1.png", 0.5
@@ -168,7 +175,7 @@ class Game
     x, y = @viewport\unproject x,y
 
     if button == "l"
-      @w\add EnemySpawn Vec2d(x,y), 3
+      @w\add EnemySpawn Vec2d(x,y), 0.2
 
     if button == "r"
 

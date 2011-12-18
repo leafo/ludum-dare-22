@@ -4,6 +4,9 @@ import keyboard, graphics from love
 
 export *
 
+cool_down = 1.0
+knock_back = 200
+
 class Entity
   w: 20
   h: 20
@@ -65,6 +68,8 @@ class Player extends Entity
   new: (world, x=0, y=0) =>
     super world, x, y
 
+    @x_knock = 0
+
     @on_ground = false
     @facing = "right"
 
@@ -106,13 +111,44 @@ class Player extends Entity
     else
       0
   
+    -- see if we are hitting an enemy
+    for e in @world.enemies\each!
+      if not e.immune and e.box\touches_box @box
+        e.immune = cool_down
+        @velocity[2] = -200
+        @x_knock = if @box\left_of e.box
+          -knock_back
+        else
+          knock_back
+
+
     if @on_ground and keyboard.isDown " "
       @velocity[2] = -300
     else
       @velocity += @world.gravity * dt
 
-    delta = Vec2d dx*@speed, 0
+    speed = @speed
+    speed /= 1.2 if not @on_ground
+    speed /= 1.2 if math.abs(@x_knock) > 30
+
+    delta = Vec2d dx * speed, 0
     delta += @velocity
+
+    -- when a player is hit by enemy
+    if @x_knock != 0
+      delta[1] += @x_knock
+      ax = math.abs(@x_knock)
+      if @on_ground
+        @x_knock = 0
+      if ax < 0.001
+        @x_knock = 0
+      elseif ax < 10
+        @x_knock /= 2
+      else
+        @x_knock -= 15*dt
+
+    delta[1] = @speed if delta[1] > @speed
+    delta[1] = -@speed if delta[1] < -@speed
 
     delta *= dt
     collided = @fit_move unpack delta
