@@ -1,6 +1,4 @@
 
-require "moon"
-
 import graphics from love
 import push, pop, scale, translate from graphics
 

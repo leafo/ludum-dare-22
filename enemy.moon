@@ -1,6 +1,5 @@
 
-require "moon"
-import mixin_object, p from moon
+
 import graphics from love
 import rectangle, setColor, getColor from love.graphics
 
@@ -110,6 +109,9 @@ class Enemy extends Entity
   update: (dt, world) =>
     super dt, world
 
+    if not game.viewport\bigger!\touches_box @box
+      return false
+
     if @health < 0
       return false
 
@@ -120,7 +122,6 @@ class Enemy extends Entity
 
     @act\update dt, world
     true
-
 
 class Slime extends Enemy
   new: (...) =>

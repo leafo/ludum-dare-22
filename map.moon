@@ -1,11 +1,9 @@
 
 -- some sort of a tile, and collision, map
 
-require "moon"
 require "collide"
 
 import rectangle, setColor, getColor from love.graphics
-import mixin_object from moon
 import random from math
 import insert from table
 

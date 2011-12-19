@@ -2,15 +2,17 @@
 -- theme: alone
 -- moonscript idea: hello\box!\world can be written as hello\box\world
 
-require "moon"
-
-import p, mixin_object from moon
 import rectangle, setColor, getColor from love.graphics
 import keyboard, graphics from love
 import insert from table
 
 export game, screen, button
 export ^
+
+export mixin_object = (object, methods) =>
+  for name in *methods
+    self[name] = (parent, ...) ->
+      object[name](object, ...)
 
 button = {
   shoot: "c"
@@ -105,7 +107,7 @@ class World
         oy: 1210
       }
     }
-    @map = Map.from_image "images/small.png", "images/tiles.png"
+    @map = Map.from_image "images/map1.png", "images/tiles.png"
 
     @overlay = (y) ->
       p = y / @map.real_height
