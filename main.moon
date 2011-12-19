@@ -9,8 +9,13 @@ import rectangle, setColor, getColor from love.graphics
 import keyboard, graphics from love
 import insert from table
 
-export game, screen
+export game, screen, button
 export ^
+
+button = {
+  shoot: "c"
+  jump: "x"
+}
 
 scale = 2
 screen = {
@@ -131,7 +136,7 @@ class World
     else
       @draw_list\update dt, self
 
-    -- update enemy spawners[
+    -- update enemy spawners
     if @map.spawners
       ss = @map.spawners\get_candidates game.viewport.box
       for spawn_box in *ss
@@ -202,13 +207,13 @@ class Game extends GameState
     graphics.print tostring(love.timer.getFPS!), 10, 10
 
   keypressed: (key, code) =>
-    if key == "lctrl"
+    if key == button.shoot
       @player\shoot!
 
     if key == "p"
       @paused = not @paused
 
-    if key == "x"
+    if key == "q"
       print "DIE"
       @player\die!
 

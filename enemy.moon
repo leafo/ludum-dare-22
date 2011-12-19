@@ -50,7 +50,7 @@ class Act
         @current_action = nil
 
 class Repeater
-  new: (@rate, @action) => @time = 0
+  new: (@rate, @action) => @time = @rate
 
   update: (dt, ...) =>
     @time += dt
@@ -67,6 +67,7 @@ class EnemySpawn
 
   spawn: (world) =>
     if @current
+      @repeater.time = 0
       if not @current.alive
         @current = nil
     else

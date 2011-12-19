@@ -181,7 +181,7 @@ class Player extends Entity
           knock_back
             
     if not game.freeze
-      if @on_ground and keyboard.isDown " "
+      if @on_ground and keyboard.isDown button.jump
         @velocity[2] = -300
       else
         @velocity += @world.gravity * dt

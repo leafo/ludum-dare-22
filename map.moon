@@ -137,13 +137,13 @@ tile_types = {
     layer: 0
     sid: style.back
     auto: (x,y, i) =>
+      below = @tiles[@to_i x, y + 1]
+
       x, y = x * @cell_size, y * @cell_size
       box = Box x,y, 10, 10
-      box.spawner = EnemySpawn Vec2d(x,y), 0.2
+      box.spawner = EnemySpawn Vec2d(x,y), 4.0
       @spawners\add box
-      -- take the style of the tile below
 
-      below = @tiles[@to_i x, y + 1]
       if below
         below.sid
       else
