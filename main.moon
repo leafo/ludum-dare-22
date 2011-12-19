@@ -19,9 +19,8 @@ sounds = {}
 export play_sound = (name) ->
   s = sounds[name]
   if s
-    s\rewind!
-    s\play!
-
+    audio.rewind s
+    audio.play s
 
 button = {
   shoot: "c"
