@@ -117,6 +117,9 @@ class Menu extends GameState
       @game\attach love
 
   keypressed: (key, code) =>
-    @game = Game! if key == "return"
+    if key == "return"
+      play_sound "start"
+      @game = Game!
+
     os.exit! if key == "escape"
 

@@ -3,16 +3,25 @@
 -- moonscript idea: hello\box!\world can be written as hello\box\world
 
 import rectangle, setColor, getColor from love.graphics
-import keyboard, graphics from love
+import keyboard, graphics, audio from love
 import insert from table
 
-export game, screen, button
+export game, screen, button, sounds
 export ^
 
 export mixin_object = (object, methods) =>
   for name in *methods
     self[name] = (parent, ...) ->
       object[name](object, ...)
+
+
+sounds = {}
+export play_sound = (name) ->
+  s = sounds[name]
+  if s
+    s\rewind!
+    s\play!
+
 
 button = {
   shoot: "c"
@@ -238,6 +247,17 @@ class Game extends GameState
     nil
 
 love.load = ->
+  source = audio.newSource "sound/theme.ogg"
+  source\setLooping true
+  source\play!
+
+  sounds.shoot = audio.newSource "sound/shot.wav", "static"
+  sounds.hit_wall = audio.newSource "sound/hit_wall.wav", "static"
+  sounds.hit_monster = audio.newSource "sound/hit_monster.wav", "static"
+  sounds.jump = audio.newSource "sound/jump.wav", "static"
+  sounds.start = audio.newSource "sound/start.wav", "static"
+  sounds.hit_me = audio.newSource "sound/hit_me.wav", "static"
+
   game = Menu!
   game\attach love
 

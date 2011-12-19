@@ -134,6 +134,7 @@ class Player extends Entity
     GameOver(game)\attach love
 
   onhit: (enemy) =>
+    play_sound "hit_me"
     super enemy
     game\flash_screen {255, 0 ,0}
     @health -= 20
@@ -142,6 +143,7 @@ class Player extends Entity
     @die!  if @health == 0
 
   shoot: =>
+    play_sound "shoot"
     flip = @facing == "left"
 
     v = Vec2d @bullet_speed, 0
@@ -183,6 +185,7 @@ class Player extends Entity
             
     if not game.freeze
       if @on_ground and keyboard.isDown button.jump
+        play_sound "jump"
         @velocity[2] = -300
       else
         @velocity += @world.gravity * dt
@@ -255,12 +258,14 @@ class Bullet
     @box\move unpack @v * dt
 
     if world\collides self
+      play_sound "hit_wall"
       world\add @emitter!
       false
     else
       -- try all the enemies
       for e in world.enemies\each!
         if e.box\touches_box @box
+          play_sound "hit_monster"
           if e\onhit self
             game.player.enemies_killed += 1
             world\add with @emitter!
