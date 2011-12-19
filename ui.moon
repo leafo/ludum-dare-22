@@ -107,6 +107,10 @@ class Menu extends GameState
     graphics.scale screen.scale, screen.scale
     graphics.draw @title, 0, 0
 
+    setColor 255,255,255,64
+    graphics.print "Arrows to move - X to jump - C to shoot", 10, 185
+
+
   update: (dt) =>
     if @game
       print "load time:", dt
