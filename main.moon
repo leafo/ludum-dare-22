@@ -22,7 +22,7 @@ screen = {
 
 _newImage = graphics.newImage
 graphics.newImage = (...) ->
-  print "loading image"
+  print "loading image:", ...
   with _newImage ...
     \setFilter "nearest", "nearest"
 
@@ -131,6 +131,12 @@ class World
     else
       @draw_list\update dt, self
 
+    -- update enemy spawners[
+    if @map.spawners
+      ss = @map.spawners\get_candidates game.viewport.box
+      for spawn_box in *ss
+        spawn_box.spawner\update dt, self
+
   draw: =>
     for bg in *@bgs
       bg\draw game.viewport
@@ -194,8 +200,6 @@ class Game extends GameState
     setColor {255,255,255}
 
     graphics.print tostring(love.timer.getFPS!), 10, 10
-    -- graphics.print tostring(@player.box), 10, 20
-    -- graphics.print tostring(@player), 10, 30
 
   keypressed: (key, code) =>
     if key == "lctrl"

@@ -133,6 +133,23 @@ tile_types = {
     auto: (x,y) => insert @win_blocks, {x,y}
   }
 
+  ["255-0-255"]: {
+    layer: 0
+    sid: style.back
+    auto: (x,y, i) =>
+      x, y = x * @cell_size, y * @cell_size
+      box = Box x,y, 10, 10
+      box.spawner = EnemySpawn Vec2d(x,y), 0.2
+      @spawners\add box
+      -- take the style of the tile below
+
+      below = @tiles[@to_i x, y + 1]
+      if below
+        below.sid
+      else
+        "nil"
+  }
+
 
   ["255-0-0"]: { spawn: true }
 }
@@ -185,12 +202,17 @@ class Map
 
     @win_blocks = {}
 
+    @spawners = UniformGrid @cell_size * 12
+
     -- do the autotiles
     for x,y,t,i in @each_xyt!
       if t and t.auto
         sid = t.auto self, x,y,t,i
-        if sid
+        if sid == "nil"
+          @tiles[i] = nil
+        elseif sid
           @tiles[i] = { layer: t.layer, :sid }
+
 
     @layers = {}
     for x,y,t,i in @each_xyt!
