@@ -141,6 +141,7 @@ class World
     -- update enemy spawners
     if @map.spawners
       ss = @map.spawners\get_candidates game.viewport.box
+      @visible_spawners = #ss
       for spawn_box in *ss
         spawn_box.spawner\update dt, self
 
@@ -163,6 +164,7 @@ class Game extends GameState
 
   new: =>
     game = self
+    @start_time = love.timer.getTime!
     @w = World!
     @viewport = Viewport!
     @player = Player @w, 0, 0
@@ -206,7 +208,9 @@ class Game extends GameState
 
     setColor {255,255,255}
 
-    graphics.print tostring(love.timer.getFPS!), 10, 10
+    -- graphics.print tostring(love.timer.getFPS!), 10, 10
+    -- if @w.visible_spawners
+    --   graphics.print ("visible spawners: %d")\format(@w.visible_spawners), 10, 23
 
   keypressed: (key, code) =>
     if key == button.shoot
@@ -222,15 +226,14 @@ class Game extends GameState
     os.exit! if key == "escape"
 
   mousepressed: (x, y, button) =>
-    x, y = @viewport\unproject x,y
+    -- x, y = @viewport\unproject x,y
+    -- if button == "l"
+    --   @w\add EnemySpawn Vec2d(x,y), 0.2
 
-    if button == "l"
-      @w\add EnemySpawn Vec2d(x,y), 0.2
+    -- if button == "r"
 
-    if button == "r"
-
-      @w\add with Emitter x, y
-        .life = 10
+    --   @w\add with Emitter x, y
+    --     .life = 10
 
     nil
 

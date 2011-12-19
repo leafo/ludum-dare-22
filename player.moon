@@ -75,8 +75,9 @@ class Entity
 
 class Player extends Entity
   max_health: 100
+  enemies_killed: 0
 
-  speed: 400
+  speed: 200
   bullet_speed: 400
   w: 14
   h: 30
@@ -261,6 +262,7 @@ class Bullet
       for e in world.enemies\each!
         if e.box\touches_box @box
           if e\onhit self
+            game.player.enemies_killed += 1
             world\add with @emitter!
               .color = {255, 64, 64}
               .fill = "fill"

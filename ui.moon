@@ -69,6 +69,11 @@ class FadeOut extends GameState
       @real_draw! if @real_draw
 
 class GameOver extends FadeOut
+  new: (game) =>
+    @time_taken = love.timer.getTime! - game.start_time
+    @killed = game.player.enemies_killed
+    super game
+
   keypressed: (key) =>
     Menu!\attach love if key == "return"
     os.exit! if key == "escape"
@@ -77,7 +82,8 @@ class GameOver extends FadeOut
     setColor 200,200,200, 255
     graphics.print "Game over", 100, 100
     setColor 128, 128, 128
-    graphics.print "Press Enter to go to menu", 100, 120
+    graphics.print ("Enemies killed: %d")\format(@killed), 100, 120
+    graphics.print "Press Enter to go to menu", 100, 180
     setColor 255,255,255
 
 class Victory extends GameOver
@@ -85,7 +91,11 @@ class Victory extends GameOver
     setColor 200,200,200, 255
     graphics.print "You win", 100, 100
     setColor 128, 128, 128
-    graphics.print "Press Enter to go to menu", 100, 120
+    graphics.print "Thanks for playing!", 100, 120
+    graphics.print ("Enemies killed: %d")\format(@killed), 100, 140
+    graphics.print ("Time taken: %d seconds")\format(@time_taken), 100, 160
+
+    graphics.print "Press Enter to go to menu", 100, 200
     setColor 255,255,255
 
 class Menu extends GameState

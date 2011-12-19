@@ -139,7 +139,7 @@ tile_types = {
 
       x, y = x * @cell_size, y * @cell_size
       box = Box x,y, 10, 10
-      box.spawner = EnemySpawn Vec2d(x,y), 4.0
+      box.spawner = EnemySpawn Vec2d(x,y), random! * 2
       @spawners\add box
 
       if below

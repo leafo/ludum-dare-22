@@ -2,7 +2,6 @@
 
 import graphics from love
 import rectangle, setColor, getColor from love.graphics
-
 import abs, random from math
 
 export *
@@ -49,7 +48,7 @@ class Act
         @current_action = nil
 
 class Repeater
-  new: (@rate, @action) => @time = @rate
+  new: (@rate, @action) => @time = @rate * random!
 
   update: (dt, ...) =>
     @time += dt
@@ -60,7 +59,6 @@ class Repeater
 
 class EnemySpawn
   new: (@o, rate) =>
-    print "new spawner"
     @repeater = Repeater rate, self\spawn
     mixin_object self, @repeater, { "update" }
 
