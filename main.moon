@@ -2,6 +2,8 @@
 -- theme: alone
 -- moonscript idea: hello\box!\world can be written as hello\box\world
 
+export love = aroma unless love
+
 import rectangle, setColor, getColor from love.graphics
 import keyboard, graphics, audio from love
 import insert from table
@@ -19,8 +21,8 @@ sounds = {}
 export play_sound = (name) ->
   s = sounds[name]
   if s
-    audio.rewind s
-    audio.play s
+    s\rewind!
+    s\play!
 
 button = {
   shoot: "c"
