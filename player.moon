@@ -7,6 +7,21 @@ export *
 cool_down = 1.0
 knock_back = 200
 
+_floor, _ceil = math.floor, math.ceil
+
+floor = (n) ->
+  if n < 0
+    -_floor -n
+  else
+    _floor n
+
+
+ceil = (n) ->
+  if n < 0
+    -_ceil -n
+  else
+    _ceil n
+
 class Entity
   flash_duration: 0.1
   w: 20
@@ -55,23 +70,44 @@ class Entity
     @facing = "right" if dx > 0
     @facing = "left" if dx < 0
 
-    dx = math.floor dx
-    dy = math.floor dy
-    if dx != 0
-      ddx = dx < 0 and -1 or 1
+    -- x
+    if dx > 0
+      start = @box.x
       @box.x += dx
-      while @world\collides self
-        collided_x = true
-        @box.x -= ddx
+      if @world\collides self
+        @box.x = floor @box.x
+        while @world\collides self
+          collided_x = true
+          @box.x -= 1
+    elseif dx < 0
+      start = @box.x
+      @box.x += dx
+      if @world\collides self
+        @box.x = ceil @box.x
+        while @world\collides self
+          collided_x = true
+          @box.x += 1
 
-    if dy != 0
-      ddy = dy < 0 and -1 or 1
+    -- y
+    if dy > 0
+      start = @box.y
       @box.y += dy
-      while @world\collides self
-        collided_y = true
-        @box.y -= ddy
+      if @world\collides self
+        @box.y = floor @box.y
+        while @world\collides self
+          collided_y = true
+          @box.y -= 1
+    elseif dy < 0
+      start = @box.y
+      @box.y += dy
+      if @world\collides self
+        @box.y = ceil @box.y
+        while @world\collides self
+          collided_y = true
+          @box.y += 1
 
     collided_y, collided_x
+
 
 class Player extends Entity
   max_health: 100
@@ -167,7 +203,7 @@ class Player extends Entity
       0
 
     dx = 0 if game.freeze
-  
+
     if @hit_time
       @hit_time -= dt
       @hit_time = nil if @hit_time < 0
@@ -182,7 +218,7 @@ class Player extends Entity
           -knock_back
         else
           knock_back
-            
+
     if not game.freeze
       if @on_ground and keyboard.isDown button.jump
         play_sound "jump"
