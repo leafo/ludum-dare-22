@@ -108,7 +108,6 @@ class Entity
 
     collided_y, collided_x
 
-
 class Player extends Entity
   max_health: 100
   enemies_killed: 0
@@ -322,5 +321,5 @@ class Bullet
     @anim\draw @box.x, @box.y
 
   __tostring: =>
-    ("bullet<%f, %f>")\format @box.x @box.y
+    ("bullet<%f, %f>")\format @box.x, @box.y
 

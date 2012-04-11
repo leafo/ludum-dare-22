@@ -132,14 +132,8 @@ class World
       @player.box\set_pos unpack @map.spawn
       @player.velocity = Vec2d 0, 0
 
-  show_collidable: =>
-    for box in *@map\get_candidates @player.box
-      Box.draw box, { 240, 81, 90, 128 }
-
   collides: (thing) =>
-    for tile_box in *@map\get_candidates thing.box
-      return true if thing.box\touches_box tile_box
-    false
+    @map\collides thing
 
   update: (dt) =>
     -- see if we won
@@ -162,7 +156,6 @@ class World
     @map\draw game.viewport
     @player\draw! if @player
     @draw_list\draw!
-    -- @show_collidable!
 
   __tostring: => "world<>"
 

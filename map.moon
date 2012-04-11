@@ -190,7 +190,7 @@ class Map
 
   new: (@width, @height, @tiles) =>
     @count = @width * @height
-    layer = -> UniformGrid @cell_size * 3
+    layer = -> {}
 
     @min_layer, @max_layer = nil
 
@@ -211,7 +211,6 @@ class Map
         elseif sid
           @tiles[i] = { layer: t.layer, :sid }
 
-
     @layers = {}
     for x,y,t,i in @each_xyt!
       if t
@@ -219,11 +218,11 @@ class Map
           x * @cell_size, y * @cell_size,
           @cell_size, @cell_size
 
-        @min_layer = not @min_layer and t.layer or math.min @min_layer, t.layer
-        @max_layer = not @max_layer and t.layer or math.max @max_layer, t.layer
+        @min_layer = math.min @min_layer or t.layer, t.layer
+        @max_layer = math.max @max_layer or t.layer, t.layer
 
-        @layers[t.layer] = layer!  if not @layers[t.layer]
-        @layers[t.layer]\add box
+        @layers[t.layer] = layer! if not @layers[t.layer]
+        @layers[t.layer][i] = box
 
     
     @win_blocks = for coord in *@win_blocks
@@ -232,7 +231,6 @@ class Map
 
     print "min:", @min_layer, "max:", @max_layer
     @solid = @layers[1]
-    mixin_object self, @solid, {"get_candidates"}
 
   is_winning: (thing) =>
     for b in *@win_blocks
@@ -260,8 +258,39 @@ class Map
         y = math.floor(i / @width)
         coroutine.yield x, y, t, i + 1
 
+  -- get all tile id touching box
+  tiles_for_box: (box) =>
+    xy_to_i = (x,y) ->
+      col = math.floor x / @cell_size
+      row = math.floor y / @cell_size
+      col + @height * row + 1 -- 1 indexed
+
+    coroutine.wrap ->
+      x1, y1, x2, y2 = box\unpack2!
+      x, y = x1, y1
+
+      max_x = x2
+      rem_x = max_x % @cell_size
+      max_x += @cell_size - rem_x if rem_x != 0
+
+      max_y = y2
+      rem_y = max_y % @cell_size
+      max_y += @cell_size - rem_y if rem_y != 0
+
+      while y <= max_y
+        x = x1
+        while x <= max_x
+          coroutine.yield xy_to_i x, y
+          x += @cell_size
+        y += @cell_size
+
   draw: (viewport) =>
-    for i=@min_layer,@max_layer
-      for tile in *@layers[i]\get_candidates viewport.box
-        tile\draw @sprite
+    for layer=@min_layer, @max_layer
+      for tid in @tiles_for_box viewport.box
+        tile = @layers[layer][tid]
+        tile\draw @sprite if tile
+
+  collides: (thing) =>
+    for tid in @tiles_for_box thing.box
+      return true if @solid[tid]
 
