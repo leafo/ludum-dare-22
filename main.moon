@@ -84,8 +84,8 @@ class Viewport
   center_on: (thing) =>
     cx, cy = thing.box\center!
 
-    @box.x = cx - @box.w / 2
-    @box.y = cy - @box.h / 2
+    @box.x = math.floor cx - @box.w / 2
+    @box.y = math.floor cy - @box.h / 2
 
 
     @box.x = 0 if @box.x < 0
