@@ -241,7 +241,7 @@ class Game extends GameState
     nil
 
 love.load = ->
-  source = audio.newSource "sound/theme.ogg"
+  source = audio.newSource "sound/theme.ogg", "streaming"
   source\setLooping true
   source\play!
 

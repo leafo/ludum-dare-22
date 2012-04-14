@@ -1,0 +1,153 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>hi</title>
+  <style type="text/css">
+    body {
+      font-family: sans-serif;
+    }
+
+    embed {
+      border: 4px dashed #666;
+    }
+
+    textarea {
+      width: 550px;
+      height: 300px;
+    }
+
+    body {
+      margin-top: 40px;
+      background: #eee;
+    }
+
+    #quick_list li {
+      text-decoration: underline;
+      cursor: pointer;
+      color: #333;
+    }
+
+    .editor, .game, .box {
+      vertical-align: top;
+      background: white;
+      padding: 8px;
+      margin: 0px 8px;
+      display: inline-block;
+      box-shadow: 0px 0px 8px rgba(0,0,0, 0.3);
+    }
+
+    .list {
+      display: inline-block;
+    }
+
+    .editor .buttons {
+      text-align: right;
+    }
+
+    .err {
+      color: #931A1A;
+    }
+
+  </style>
+</head>
+<body>
+
+  <div class="game">
+    <div id="listener">
+      <embed name="nacl_module"
+        id="aroma"
+        width=800 height=400
+        src="aroma.nmf"
+        type="application/x-nacl" />
+    </div>
+  </div>
+
+  <div class="editor">
+    <textarea id="input"></textarea>
+    <div class="buttons">
+      <span class="loading">Loading...</span>
+      <button id="run" disabled="disabled">Execute</button>
+    </div>
+  </div>
+
+  <pre id="output"></pre>
+
+  <script type="text/javascript" src="js/aroma.js"></script>
+  <script type="text/javascript">
+    (function() {
+      $ = function(name) { return document.getElementById(name); }
+      A = function(thing) { return Array.prototype.slice.apply(thing) };
+
+      var output = $("output");
+
+      function escape_html(str) {
+        return str.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+      }
+
+      game = new Aroma(document.getElementById("listener"), {
+        loaded: function() {
+          A(document.querySelectorAll(".loading")).map(function(e) {
+            e.style.display = "none";
+          });
+          $("run").disabled = false;
+        },
+        std_out: function(str) {
+          output.innerHTML += escape_html(str) + "\n";
+        },
+        std_err: function(str) {
+          output.innerHTML += "<span class='err'>" +
+            escape_html(str) + "</span>\n";
+        }
+      });
+
+      function e(items) {
+        items = items.map(function(i) {
+          return '"' + i + '"';
+        });
+        return items.join(",\n");
+      }
+      
+      var code = [
+        "background.lua", "collide.lua", "conf.lua", "enemy.lua", "main.lua",
+        "map.lua", "particle.lua", "player.lua", "spriter.lua", "ui.lua"
+      ];
+
+      var images = [
+        "images/bg1.png", "images/bg2.png", "images/enemy.png",
+        "images/map1.png", "images/player.png", "images/tiles.png",
+        "images/title.png",
+      ];
+
+      var sound = [
+        "sound/hit_me.wav", "sound/hit_monster.wav", "sound/hit_wall.wav",
+        "sound/jump.wav", "sound/shot.wav", "sound/start.wav",
+      ];
+
+      var music = [
+        "sound/theme.ogg",
+      ];
+
+
+      $("input").value = [
+        'nacl.prefetch {',
+        e(code),
+        ',image = {' + e(images) + '}',
+        ',sound = {' + e(sound) + '}',
+        ',music = {' + e(music) + '}',
+        '}',
+        'require "main"',
+        'aroma.load()',
+      ].join("\n");
+
+      function run() {
+        var code = $("input").value;
+        output.innerHTML = "";
+        game.execute(code);
+      }
+
+      $("run").onclick = run;
+    })();
+  </script>
+</body>
+</html>
