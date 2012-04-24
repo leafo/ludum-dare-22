@@ -6,9 +6,15 @@
   <style type="text/css">
     body {
       font-family: sans-serif;
+      text-align: center;
     }
 
     embed {
+      display: block;
+      background: black url('ui/loading.gif') 50% 50% no-repeat;
+    }
+
+    #listener {
       border: 4px dashed #666;
     }
 
@@ -28,25 +34,71 @@
       color: #333;
     }
 
-    .editor, .game, .box {
+    #editor, .game, .box {
       vertical-align: top;
       background: white;
       padding: 8px;
-      margin: 0px 8px;
+      margin: 8px;
       display: inline-block;
       box-shadow: 0px 0px 8px rgba(0,0,0, 0.3);
+    }
+
+    #editor:not(.visible) {
+      display: none;
     }
 
     .list {
       display: inline-block;
     }
 
-    .editor .buttons {
+    #editor .buttons {
       text-align: right;
     }
 
     .err {
-      color: #931A1A;
+      color: #FF7575;
+    }
+
+    .console {
+      text-align: left;
+      background: #333;
+      color: white;
+      padding: 12px;
+      margin; 4px;
+      width: 550px;
+    }
+
+    .footer {
+      font-size: 11px;
+      color: #444;
+    }
+
+    a {
+      color: #666;
+    }
+
+    .game {
+      position: relative;
+    }
+
+    .loading_message { 
+      position: absolute;
+      font-size: 12px;
+      background: rgba(0,0,0, 0.5) url('ui/loading2.gif') 8px 50% no-repeat;
+      color: white;
+      padding: 8px 12px;
+      padding-left: 30px;
+      border-radius: 0px 0px 4px 0px;
+      box-shadow: 1px 1px 0px rgba(255,255,255, 0.4),
+        1px 1px 8px rgba(0,0,0, 0.8);
+    }
+
+    .loading_message:not(.visible) {
+      display: none;
+    }
+
+    #editor:not(.visible) {
+      display: none;
     }
 
   </style>
@@ -65,25 +117,46 @@
 </head>
 <body>
 
-  <div class="game">
-    <div id="listener">
-      <embed name="nacl_module"
-        id="aroma"
-        width=800 height=400
-        src="aroma.nmf"
-        type="application/x-nacl" />
+  <div>
+    <div class="game">
+      <div id="listener">
+        <div class="loading_message">Loading something..</div>
+        <embed name="nacl_module"
+          id="aroma"
+          width=800 height=400
+          src="aroma.nmf"
+          type="application/x-nacl">
+          </embed>
+      </div>
+    </div>
+
+    <div id="editor">
+      <textarea id="input"></textarea>
+      <div class="buttons">
+        <span class="loading">Loading...</span>
+        <button id="run" disabled="disabled">Execute</button>
+        <button id="clear_code" disabled="disabled">Clear Code</button>
+        <button id="clear_console" disabled="disabled">Clear Console</button>
+      </div>
+      <pre class="console" id="output">
+      </pre>
     </div>
   </div>
 
-  <div class="editor">
-    <textarea id="input"></textarea>
-    <div class="buttons">
-      <span class="loading">Loading...</span>
-      <button id="run" disabled="disabled">Execute</button>
+  <div class="footer">
+    <div>
+      Volcanox was created by <a href="http://leafo.net">leafo</a> for Ludum Dare 22
+    </div>
+    <div>
+      Written in <a href="http://moonscript.org/">MoonScript</a>, running on
+      <a href="http://leafo.net/aroma">Aroma</a>
+    </div>
+    <div>
+      <a href="https://github.com/leafo/ludum-dare-22">Source</a>.
+      <a href="#" id="toggle_console">Toggle Console</a>
     </div>
   </div>
 
-  <pre id="output"></pre>
 
   <script type="text/javascript" src="js/aroma.js"></script>
   <script type="text/javascript">
@@ -102,7 +175,12 @@
           A(document.querySelectorAll(".loading")).map(function(e) {
             e.style.display = "none";
           });
-          $("run").disabled = false;
+
+          A(document.querySelectorAll(".buttons button")).map(function(b) {
+            b.disabled = false;
+          });
+
+          run();
         },
         std_out: function(str) {
           output.innerHTML += escape_html(str) + "\n";
@@ -141,12 +219,21 @@
       ];
 
 
+      $("toggle_console").onclick = function(e) {
+        var editor = $("editor");
+        if (editor.className.match(/visible/)) {
+          editor.className = editor.className.replace(/visible/, "");
+        } else {
+          editor.className += " visible";
+        }
+      };
+
       $("input").value = [
         'nacl.prefetch {',
         e(code),
         ',image = {' + e(images) + '}',
         ',sound = {' + e(sound) + '}',
-        ',music = {' + e(music) + '}',
+        // ',music = {' + e(music) + '}',
         '}',
         'nacl.track_event("Volcanox", "load", "time", aroma.timer.getTime())',
         'require "main"',
@@ -160,6 +247,12 @@
       }
 
       $("run").onclick = run;
+      $("clear_code").onclick = function() {
+        $("input").value = "";
+      }
+      $("clear_console").onclick = function() {
+        $("output").innerHTML = "";
+      };
     })();
   </script>
 </body>
