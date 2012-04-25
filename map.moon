@@ -263,7 +263,7 @@ class Map
     xy_to_i = (x,y) ->
       col = math.floor x / @cell_size
       row = math.floor y / @cell_size
-      col + @height * row + 1 -- 1 indexed
+      col + @width * row + 1 -- 1 indexed
 
     coroutine.wrap ->
       x1, y1, x2, y2 = box\unpack2!
