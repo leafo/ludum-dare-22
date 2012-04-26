@@ -13,10 +13,6 @@
       display: block;
     }
 
-    #listener {
-      border: 4px dashed #666;
-    }
-
     textarea {
       width: 550px;
       height: 300px;
@@ -33,7 +29,7 @@
       color: #333;
     }
 
-    #editor, .game, .box {
+    .box {
       vertical-align: top;
       background: white;
       padding: 8px;
@@ -76,7 +72,7 @@
       color: #666;
     }
 
-    .game {
+    #game {
       position: relative;
     }
 
@@ -101,19 +97,8 @@
 <body>
 
   <div>
-    <div class="game">
-      <div id="listener">
-        <div class="loading_message">Loading something..</div>
-        <embed name="nacl_module"
-          id="aroma"
-          width=800 height=400
-          src="aroma.nmf"
-          type="application/x-nacl">
-          </embed>
-      </div>
-    </div>
-
-    <div id="editor">
+    <div id="game_container" class="box"></div>
+    <div id="editor" class="box">
       <textarea id="input"></textarea>
       <div class="buttons">
         <span class="loading">Loading...</span>
@@ -153,7 +138,7 @@
         return str.replace(/</g, "&lt;").replace(/>/g, "&gt;");
       }
 
-      game = new Aroma(document.getElementById("listener"), {
+      game = new Aroma($("game_container"), 800, 400, {
         loaded: function() {
           A(document.querySelectorAll(".loading")).map(function(e) {
             e.style.display = "none";
