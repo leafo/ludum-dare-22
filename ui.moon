@@ -76,7 +76,7 @@ class GameOver extends FadeOut
 
   keypressed: (key) =>
     Menu!\attach love if key == "return"
-    os.exit! if key == "escape"
+    os.exit! if key == "escape" and not aroma
 
   real_draw: =>
     setColor 200,200,200, 255
@@ -121,5 +121,5 @@ class Menu extends GameState
       play_sound "start"
       @game = Game!
 
-    os.exit! if key == "escape"
+    os.exit! if key == "escape" and not aroma
 

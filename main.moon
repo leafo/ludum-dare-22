@@ -226,7 +226,7 @@ class Game extends GameState
       print "DIE"
       @player\die!
 
-    os.exit! if key == "escape"
+    os.exit! if key == "escape" and not aroma
 
   mousepressed: (x, y, button) =>
     -- x, y = @viewport\unproject x,y
