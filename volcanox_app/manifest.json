@@ -1,0 +1,17 @@
+{
+  "name": "Volcanox (NaCl Test)",
+  "description": "Simple platformer made for Ludum Dare 22, ported to Chrome's Native Client as a test",
+  "version": "4",
+  "app": {
+    "urls": [
+      "http://leafo.net/aroma/volcanox"
+    ],
+    "launch": {
+      "web_url": "http://leafo.net/aroma/volcanox"
+    }
+  },
+  "icons": {
+    "128": "icon_128.png"
+  },
+  "permissions": []
+}
