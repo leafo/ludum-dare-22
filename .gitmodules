@@ -1,0 +1,3 @@
+[submodule "lib/lovekit"]
+	path = lib/lovekit
+	url = git@github.com:leafo/lovekit.git
